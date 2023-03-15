@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Simple Board</title>
+    <script>
+        function fetchPosts(page = 0) {
+            fetch(`/api/posts?page=${page}`)
+                .then(response => response.json())
+                .then(data => {
+                    let postsTable = document.getElementById('posts-table');
+                    postsTable.innerHTML = `
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Author</th>
+                            <th>Posted At</th>
+                        </tr>`;
+                    data.content.forEach(post => {
+                        let row = document.createElement('tr');
+
+                        let idCell = document.createElement('td');
+                        idCell.innerText = post.id;
+                        row.appendChild(idCell);
+
+                        let titleCell = document.createElement('td');
+                        titleCell.innerText = post.title;
+                        row.appendChild(titleCell);
+
+                        let authorCell = document.createElement('td');
+                        authorCell.innerText = post.writerName;
+                        row.appendChild(authorCell);
+
+                        let postedAtCell = document.createElement('td');
+                        postedAtCell.innerText = new Date(post.postedAt).toLocaleString();
+                        row.appendChild(postedAtCell);
+
+                        postsTable.appendChild(row);
+                    });
+
+                    let pagination = document.getElementById('pagination');
+                    pagination.innerHTML = '';
+                    for (let i = 0; i < data.totalPages; i++) {
+                        let button = document.createElement('button');
+                        button.innerText = i + 1;
+                        button.onclick = () => fetchPosts(i);
+                        pagination.appendChild(button);
+                    }
+                });
+        }
+
+        window.onload = () => fetchPosts();
+    </script>
+</head>
+<body>
+<h1>Posts</h1>
+<div>
+    <table id="posts-table">
+    </table>
+</div>
+<div>
+    <nav id="pagination">
+    </nav>
+</div>
+</body>
+</html>
