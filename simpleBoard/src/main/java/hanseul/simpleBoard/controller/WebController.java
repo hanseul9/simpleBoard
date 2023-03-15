@@ -9,4 +9,9 @@ public class WebController {
     public String getPostTitles() {
         return "posts";
     }
+
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
 }

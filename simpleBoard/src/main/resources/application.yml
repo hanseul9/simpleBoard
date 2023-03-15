@@ -1,4 +1,14 @@
 spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 593074685189-41dcdj82mjolgrrj05fgt833purdfatr.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - profile
+              - email
   datasource:
     url: jdbc:mysql://localhost:3306/simpleBoardDB?serverTimezone=Asia/Seoul
     username: simpleBoardAdmin
