@@ -9,6 +9,8 @@ spring:
             scope:
               - profile
               - email
+  thymeleaf:
+    enabled: true
   datasource:
     url: jdbc:mysql://localhost:3306/simpleBoardDB?serverTimezone=Asia/Seoul
     username: simpleBoardAdmin
@@ -29,5 +31,5 @@ logging:
   file:
     name: my-application.log
     path: /path/to/log/file
-#  level:
-#    org.hibernate.SQL: debug
+  level:
+    com.example.myapp: DEBUG

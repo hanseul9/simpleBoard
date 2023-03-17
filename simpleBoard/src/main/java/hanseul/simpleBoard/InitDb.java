@@ -7,6 +7,7 @@ import hanseul.simpleBoard.repository.MemberRepository;
 import hanseul.simpleBoard.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 
@@ -16,6 +17,7 @@ public class InitDb implements CommandLineRunner {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    final private PasswordEncoder passwordEncoder;
 
 
     @Override
@@ -26,8 +28,9 @@ public class InitDb implements CommandLineRunner {
 
     private void loadData() {
         // Create sample members
-        Member member1 = new Member("Alice", "alice@example.com", "password123");
-        Member member2 = new Member("Bob", "bob@example.com", "password456");
+        String encodedPassword = passwordEncoder.encode("123");
+        Member member1 = new Member("Alice", "alice@example.com", encodedPassword);
+        Member member2 = new Member("Bob", "bob@example.com", encodedPassword);
 
         member1 = memberRepository.save(member1);
         member2 = memberRepository.save(member2);
