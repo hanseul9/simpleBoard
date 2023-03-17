@@ -49,11 +49,32 @@
                 });
         }
 
-        window.onload = () => fetchPosts();
+        window.onload = () => {
+            fetchPosts();
+            fetch('/api/member')
+                .then(response => response.json())
+                .then(data => {
+                    let currentUser = document.getElementById('current-user');
+                    currentUser.innerText = `Current User: ${data.data.email} (${data.data.name})`;
+                });
+        };
+
+        function logout() {
+            fetch('/api/logout', {
+                method: 'POST'
+            })
+                .then(() => {
+                    window.location.href = '/login';
+                });
+        }
     </script>
 </head>
 <body>
 <h1>Posts</h1>
+<div>
+    <p id="current-user"></p>
+    <button onclick="logout()">Logout</button>
+</div>
 <div>
     <table id="posts-table">
     </table>
