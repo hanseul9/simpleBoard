@@ -33,17 +33,22 @@ public class WebController {
         return "signup";
     }
 
-    @PostMapping("/login-process") //로그인 정보를 받음
-    public String login(MemberLoginDto dto) {
-        boolean isValidMember = memberService.isValidMember(dto.getEmail(), dto.getPassword());
-        if (isValidMember) //로그인 성공시
-            return "posts";
-        return "login"; //로그인 실패시
-    }
+//    @PostMapping("/login-process") //로그인 정보를 받음
+//    public String login(MemberLoginDto dto) {
+//        boolean isValidMember = memberService.isValidMember(dto.getEmail(), dto.getPassword());
+//        if (isValidMember) //로그인 성공시
+//            return "login";
+//        return "login"; //로그인 실패시
+//    }
 
     @GetMapping("/posts")
     public String getPostTitles() {
         return "posts";
+    }
+
+    @GetMapping("/posting")
+    public String writePost() {
+        return "posting";
     }
 
 

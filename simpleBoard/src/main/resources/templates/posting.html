@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Posting</title>
+</head>
+<body>
+<h1>Posting</h1>
+<form onsubmit="postJson(event)">
+    <div>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title"/>
+    </div>
+    <div>
+        <label for="content">Content:</label>
+        <textarea id="content" name="content"></textarea>
+    </div>
+    <button type="submit">Post</button>
+</form>
+
+<script>
+    function postJson(event) {
+        event.preventDefault(); // prevent form submission
+
+        let title = document.getElementById('title').value;
+        let content = document.getElementById('content').value;
+        let writerId = /* get the current member's ID */;
+
+        let post = {
+            title: title,
+            content: content,
+            writerId: writerId
+        };
+
+        fetch('/api/posts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(post)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(response.statusText);
+                }
+                // redirect to the home page
+                window.location.href = '/';
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+</script>
+</body>
+</html>

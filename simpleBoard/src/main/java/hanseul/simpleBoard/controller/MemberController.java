@@ -67,6 +67,7 @@ public class MemberController {
 
 
 
+
     @GetMapping("/member/{memberId}") //회원 단건 조회
     public ResponseEntity<BasicResponse> getMemberById(@PathVariable("memberId") Long memberId) {
         Optional<Member> memberOptional = memberService.findOne(memberId);

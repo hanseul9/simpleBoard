@@ -36,14 +36,14 @@ public class MemberService {
     }
 
 
-    public boolean isValidMember(String email, String password) {
-        Optional<Member> byEmail = memberRepository.findByEmail(email);
-
-        if (byEmail.isPresent()) { //올바른 비밀번호를 입력했는지 검증
-            Member member = byEmail.get();
-            return passwordEncoder.matches(password, member.getPassword());
-        }
-
-        return false;
-    }
+//    public boolean isValidMember(String email, String password) {
+//        Optional<Member> byEmail = memberRepository.findByEmail(email);
+//
+//        if (byEmail.isPresent()) { //올바른 비밀번호를 입력했는지 검증
+//            Member member = byEmail.get();
+//            return passwordEncoder.matches(password, member.getPassword());
+//        }
+//
+//        return false;
+//    }
 }

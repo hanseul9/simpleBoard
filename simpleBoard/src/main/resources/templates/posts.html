@@ -67,6 +67,12 @@
                     window.location.href = '/login';
                 });
         }
+
+        function goToPosting() {
+            window.location.href = '/posting';
+        }
+
+
     </script>
 </head>
 <body>
@@ -74,6 +80,7 @@
 <div>
     <p id="current-user"></p>
     <button onclick="logout()">Logout</button>
+    <button onclick="goToPosting()">Post a New Topic</button>
 </div>
 <div>
     <table id="posts-table">

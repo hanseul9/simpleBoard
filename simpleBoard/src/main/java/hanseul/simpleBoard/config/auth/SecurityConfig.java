@@ -19,7 +19,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity // Spring Security 설정 활성화
 @RequiredArgsConstructor
-public class SecuirtyConfig{
+public class SecurityConfig{
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -38,7 +38,7 @@ public class SecuirtyConfig{
                 )
                 .formLogin((form) -> form // form 방식 로그인 사용
                         .loginPage("/login")  //로그인 페이지
-                        .loginProcessingUrl("/login-process") //submit을 받을 url
+                        .loginProcessingUrl("/login-process") //submit을 받을 url - 시큐리티가 처리해줌
                         .usernameParameter("email") //submit할 아이디(이메일)
                         .passwordParameter("password") //submit할 비밀번호
                         .defaultSuccessUrl("/posts", true) //성공시
