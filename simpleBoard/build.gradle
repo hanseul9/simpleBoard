@@ -41,3 +41,7 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+tasks.getByName("jar"){  //jar task 스킵
+	enabled = false
+}
