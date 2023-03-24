@@ -28,6 +28,11 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'   #이클립스 
+        
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./simpleBoard/gradlew
+      shell: bash
+        
     - name: Build with Gradle
       working-directory: ./simpleBoard
       run: ./gradlew clean build -x test
