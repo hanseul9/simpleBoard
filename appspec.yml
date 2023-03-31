@@ -10,8 +10,3 @@ permissions:
     owner: ubuntu
     group: ubuntu
 
-hooks:
-  ApplicationStart:
-    - location: start.sh
-      timeout: 60
-      runas: ubuntu
