@@ -1,3 +1,7 @@
+src/main/resources/application.yml
+src/main/resources/application.properties1
+src/main/resources/application.properties2
+
 HELP.md
 .gradle
 build/
