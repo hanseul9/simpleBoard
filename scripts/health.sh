@@ -3,15 +3,15 @@
 # health.sh
 # nginx 연결 설정 변경 전 health-check 용도
 
-APP_IP_ADDRESS=ip-172-31-35-231.ap-northeast-2.compute.internal
-RESPONSE=$(curl -s http://${APP_IP_ADDRESS}:${IDLE_PORT}/profile)
-
 ABSPATH=$(readlink -f $0)
 ABSDIR=$(dirname $ABSPATH)
 source ${ABSDIR}/profile.sh
 source ${ABSDIR}/switch.sh
 
+APP_IP_ADDRESS=ip-172-31-35-231.ap-northeast-2.compute.internal
 IDLE_PORT=$(find_idle_port)
+
+RESPONSE=$(curl -s http://${APP_IP_ADDRESS}:${IDLE_PORT}/profile)
 
 echo "> Health Check Start!"
 echo "> IDLE_PORT: $IDLE_PORT"
