@@ -56,7 +56,7 @@ jobs:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       run: |
-        aws s3 cp --region ap-northeast-2 --acl private ./$PROJECT_NAME.zip s3://simpleboardbucket/
+        aws s3 cp --region us-east-1 --acl private ./$PROJECT_NAME.zip s3://simpleboardbucket/
 
 ####
 
