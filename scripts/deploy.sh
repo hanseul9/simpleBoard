@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REPOSITORY=/home/ec2-user/app/deploy/deploy
+REPOSITORY=/home/ec2-user/app/deploy
 PROJECT_NAME=simpleBoard
 
 echo "> Build 파일 복사"
