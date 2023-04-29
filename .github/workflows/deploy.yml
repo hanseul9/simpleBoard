@@ -53,7 +53,7 @@ jobs:
 
     # script file Copy
     - name: Copy shell
-      run: cp ./scripts/* .
+      run: cp ${GITHUB_WORKSPACE}/scripts/* ./deploy/
           
       ####
 
