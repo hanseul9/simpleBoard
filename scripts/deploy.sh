@@ -1,9 +1,10 @@
 #!/bin/bash
 
 REPOSITORY=/home/ec2-user/app/deploy
-PROJECT_NAME=simpleBoard/
+PROJECT_NAME=simpleBoard/simpleBoard
 
 echo "> Build 파일 복사"
+
 cp $REPOSITORY/zip/*.jar $REPOSITORY/
 
 echo "> 현재 구동중인 애플리케이션 pid 확인"
