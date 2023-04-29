@@ -7,13 +7,23 @@ ABSPATH=$(readlink -f $0)
 ABSDIR=$(dirname $ABSPATH)
 source ${ABSDIR}/profile.sh
 
-REPOSITORY=/home/ec2-user/app/deploy
+REPOSITORY=/home/ec2-user/app
 PROJECT_NAME=simpleBoard/simpleBoard
 
 echo "> Build 파일 복사"
 echo "> cp $REPOSITORY/zip/simpleBoard/build/libs/*.jar $REPOSITORY/"
-
 cp $REPOSITORY/zip/simpleBoard/build/libs/*.jar $REPOSITORY/
+
+# echo "> Build 파일 복사"
+# echo "> cp $REPOSITORY/zip/$PROJECT_NAME/build/libs/*.jar $REPOSITORY/deploy/"
+
+# if ls $REPOSITORY/zip/$PROJECT_NAME/build/libs/*.jar 1> /dev/null 2>&1; then
+#   cp $REPOSITORY/zip/$PROJECT_NAME/build/libs/*.jar $REPOSITORY/deploy/
+# else
+#   echo "> Build 파일이 존재하지 않습니다."
+#   exit 1
+# fi
+
 
 echo "> 새 어플리케이션 배포"
 JAR_NAME=$(ls -tr $REPOSITORY/*.jar | tail -n 1)
