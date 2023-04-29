@@ -53,8 +53,7 @@ jobs:
 
     # script file Copy
     - name: Copy shell
-      working-directory: ${{ github.workspace }}
-      run: cp ./scripts/* ./deploy/
+      run: cp ./scripts/* .
           
       ####
 
