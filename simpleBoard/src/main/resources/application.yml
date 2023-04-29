@@ -1,4 +1,13 @@
 spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/simpleBoardDB?serverTimezone=Asia/Seoul
+    username: simpleBoardAdmin
+    password: hanseul369
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  session:
+    store-type: jdbc
+    jdbc:
+      initialize-schema: always
   security:
     oauth2:
       client:
@@ -11,11 +20,6 @@ spring:
               - email
   thymeleaf:
     enabled: true
-  datasource:
-    url: jdbc:mysql://localhost:3306/simpleBoardDB?serverTimezone=Asia/Seoul
-    username: simpleBoardAdmin
-    password: hanseul369
-    driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
     database: mysql
