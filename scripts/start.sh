@@ -8,10 +8,10 @@ ABSDIR=$(dirname $ABSPATH)
 source ${ABSDIR}/profile.sh
 
 REPOSITORY=/home/ec2-user/app/deploy
-PROJECT_NAME=simpleBoard/sipmleBoard
+PROJECT_NAME=simpleBoard/simpleBoard
 
 echo "> Build 파일 복사"
-echo "> cp $REPOSITORY/deploy/*.jar $REPOSITORY/"
+echo "> cp $REPOSITORY/zip/simpleBoard/build/libs/*.jar $REPOSITORY/"
 
 cp $REPOSITORY/zip/simpleBoard/build/libs/*.jar $REPOSITORY/
 
