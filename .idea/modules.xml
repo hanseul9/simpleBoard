@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/simpleBoard.iml" filepath="$PROJECT_DIR$/.idea/simpleBoard.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/simpleBoard.simpleBoard.main.iml" filepath="$PROJECT_DIR$/.idea/modules/simpleBoard.simpleBoard.main.iml" />
     </modules>
   </component>
