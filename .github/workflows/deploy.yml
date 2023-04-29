@@ -53,7 +53,7 @@ jobs:
 
     # script file Copy
     - name: Copy shell
-      run: cp /home/ec2-user/app/deploy/scripts/*
+      run: cp ./scripts/* ./deploy/
           
       ####
 
