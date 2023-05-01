@@ -32,7 +32,7 @@ public class SecurityConfig{
         http
                 .csrf().disable().cors().disable()  //csrf와 cors disable
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/profile", "/status", "/", "/home", "/signup", "/member", "/profile").permitAll()
+                        .requestMatchers("/status", "/", "/home", "/signup", "/member", "/profile").permitAll()
                         //로그인 안 해도 위 url들은 접근 가능
                         .anyRequest().authenticated() // 어떠한 요청이라도 인증이 필요
                 )
