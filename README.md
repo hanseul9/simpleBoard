@@ -10,5 +10,5 @@ AWS + 스프링 security 공부용
 - front-end 영역은 chat gpt의 도움을 받음
 
 
-🔗 https://long-marlin-00a.notion.site/simpleBoard-5c4c4e271557441cb11c76c3de284880
+🔗 https://long-marlin-00a.notion.site/simpleBoard-5c4c4e271557441cb11c76c3de284880  
 🔗 http://ec2-13-125-163-167.ap-northeast-2.compute.amazonaws.com/   
