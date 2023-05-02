@@ -20,3 +20,5 @@ function switch_proxy() {
     # nignx reload. restart와는 다르게 설정 값만 불러옴
     sudo service nginx reload
 }
+
+switch_proxy
