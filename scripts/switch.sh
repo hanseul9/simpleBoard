@@ -27,4 +27,4 @@ function switch_proxy() {
     sudo service nginx reload
 }
 
-switch_proxy
+#switch_proxy
