@@ -28,11 +28,14 @@ echo "> $JAR_NAME 실행"
 
 IDLE_PROFILE=$(find_idle_profile)
 
-echo "> $JAR_NAME 를 profile=$IDLE_PROFILE 로 실행합니다."
-nohup java -jar \
-    -Dspring.config.location=classpath:/application.yml,classpath:/application-$IDLE_PROFILE.properties,/home/ec2-user/app/application-real-db.properties \
-    -Dspring.profiles.active=$IDLE_PROFILE \
-    $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
+# echo "> $JAR_NAME 를 profile=$IDLE_PROFILE 로 실행합니다."
+# nohup java -jar \
+#     -Dspring.config.location=classpath:/application.yml,classpath:/application-$IDLE_PROFILE.properties,/home/ec2-user/app/application-real-db.properties \
+#     -Dspring.profiles.active=$IDLE_PROFILE \
+#     $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &
+
+nohup sh -c 'export PATH=$PATH:/usr/local/jdk-17.0.7/bin && java -jar -Dspring.config.location=classpath:/application.yml,classpath:/application-$IDLE_PROFILE.properties,/home/ec2-user/app/application-real-db.properties -Dspring.profiles.active=$IDLE_PROFILE $JAR_NAME > $REPOSITORY/nohup.out 2>&1 &' > $REPOSITORY/nohup.out 2>&1 &
+
 
 # for PROFILE in "real1" "real2"
 # do
