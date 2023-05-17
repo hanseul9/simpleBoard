@@ -1,5 +1,6 @@
 package hanseul.simpleBoard.domain;
 
+import hanseul.simpleBoard.requestdto.post.PostRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -31,6 +32,16 @@ public class Post {
         this.member = member;
         member.getPostList().add(this);
 
+        this.postedAt = LocalDateTime.now();
+    }
+
+    public void update(PostRequestDto postRequestDto) {
+        if (postRequestDto.getTitle() != null) {
+            this.title = postRequestDto.getTitle();
+        }
+        if (postRequestDto.getContent() != null) {
+            this.content = postRequestDto.getContent();
+        }
         this.postedAt = LocalDateTime.now();
     }
 }

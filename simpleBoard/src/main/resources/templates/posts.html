@@ -12,8 +12,8 @@
                     postsTable.innerHTML = `
                         <tr>
                             <th>ID</th>
-                            <th>Title</th>
-                            <th>Author</th>
+                            <th>제목</th>
+                            <th>글쓴이</th>
                             <th>Posted At</th>
                         </tr>`;
                     data.content.forEach(post => {
@@ -55,7 +55,7 @@
                 .then(response => response.json())
                 .then(data => {
                     let currentUser = document.getElementById('current-user');
-                    currentUser.innerText = `Current User: ${data.data.email} (${data.data.name})`;
+                    currentUser.innerText = `Current User: ${data.data.email} (NickName : ${data.data.name})`;
                 });
         };
 
@@ -79,8 +79,8 @@
 <h1>Posts</h1>
 <div>
     <p id="current-user"></p>
-    <button onclick="logout()">Logout</button>
-    <button onclick="goToPosting()">Post a New Topic</button>
+    <button onclick="logout()">로그아웃</button>
+    <button onclick="goToPosting()">새 글 쓰기</button>
 </div>
 <div>
     <table id="posts-table">

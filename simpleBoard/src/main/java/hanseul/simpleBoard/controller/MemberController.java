@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class MemberController {
     private static final int SUCCESS = 200;
