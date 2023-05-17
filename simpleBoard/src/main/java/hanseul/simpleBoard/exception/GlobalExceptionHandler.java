@@ -1,5 +1,6 @@
 package hanseul.simpleBoard.exception;
 
+import hanseul.simpleBoard.exception.member.DuplicateEmailException;
 import hanseul.simpleBoard.exception.member.MemberNotFoundException;
 import hanseul.simpleBoard.exception.post.PostNotFoundException;
 import hanseul.simpleBoard.responsedto.ErrorBasicResponse;
@@ -16,8 +17,8 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+    @ExceptionHandler(MethodArgumentNotValidException.class) // Valid 예외
+    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
 
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -26,18 +27,24 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
 
-        return errors;
+        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MemberNotFoundException.class)
-    public ErrorBasicResponse handleMemberNotFoundException(MemberNotFoundException ex) {
+    public ResponseEntity<ErrorBasicResponse> handleMemberNotFoundException(MemberNotFoundException ex) {
         ErrorBasicResponse errorResponse = new ErrorBasicResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
-        return errorResponse;
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(PostNotFoundException.class)
-    public ErrorBasicResponse handleMemberNotFoundException(PostNotFoundException ex) {
+    public ResponseEntity<ErrorBasicResponse> handleMemberNotFoundException(PostNotFoundException ex) {
         ErrorBasicResponse errorResponse = new ErrorBasicResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
-        return errorResponse;
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<ErrorBasicResponse>  handleDuplicateEmailException( DuplicateEmailException ex) {
+        ErrorBasicResponse errorResponse = new ErrorBasicResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 }

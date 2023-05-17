@@ -6,7 +6,6 @@ import hanseul.simpleBoard.responsedto.BasicResponse;
 import hanseul.simpleBoard.responsedto.member.GetMemberResponseDto;
 import hanseul.simpleBoard.responsedto.member.JoinMemberResponse;
 import hanseul.simpleBoard.service.MemberService;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -17,9 +16,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
-
-import java.net.URI;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +29,6 @@ public class MemberController {
     public ResponseEntity<JoinMemberResponse> createMember(@Valid @RequestBody MemberCreateDto memberCreateDto) {
 
         Long memberId = memberService.createMember(memberCreateDto);
-
         JoinMemberResponse joinMemberResponse = new JoinMemberResponse(memberId, CREATED, "회원가입 완료");
         return new ResponseEntity<>(joinMemberResponse, HttpStatus.CREATED);
     }
