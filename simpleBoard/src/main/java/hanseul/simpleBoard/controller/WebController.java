@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.awt.*;
 
-//@RestController
+
 @Controller
 @RequiredArgsConstructor
 public class WebController {

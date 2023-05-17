@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping(("/api"))
 @RequiredArgsConstructor
 public class PostController {
 
@@ -25,7 +27,7 @@ public class PostController {
 
     private final PostService postService;
 
-    @GetMapping("/api/posts")
+    @GetMapping("/posts")
     public Page<PostListDto> getPostTitles(@RequestParam(value = "page", defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 10);
         Page<Post> posts = postService.findAllByOrderByPostedAtDesc(pageable);
