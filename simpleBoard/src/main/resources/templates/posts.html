@@ -1,3 +1,5 @@
+<!--글 목록 View-->
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -25,6 +27,9 @@
 
                         let titleCell = document.createElement('td');
                         titleCell.innerText = post.title;
+                        // 클릭시 게시글로 이동
+                        titleCell.style.cursor = "pointer"; // Change cursor style when hovering
+                        titleCell.onclick = () => showPostDetail(post.id);
                         row.appendChild(titleCell);
 
                         let authorCell = document.createElement('td');
@@ -51,7 +56,7 @@
 
         window.onload = () => {
             fetchPosts();
-            fetch('/api/member')
+            fetch('/api/members')
                 .then(response => response.json())
                 .then(data => {
                     let currentUser = document.getElementById('current-user');
@@ -70,6 +75,10 @@
 
         function goToPosting() {
             window.location.href = '/posting';
+        }
+
+        function showPostDetail(postId) {
+            window.location.href = `/postDetail?postId=${postId}`;
         }
 
 

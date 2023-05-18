@@ -7,11 +7,13 @@ import hanseul.simpleBoard.repository.MemberRepository;
 import hanseul.simpleBoard.repository.PostRepository;
 import hanseul.simpleBoard.requestdto.member.MemberCreateDto;
 import hanseul.simpleBoard.requestdto.post.PostRequestDto;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -28,6 +30,7 @@ public class PostServiceTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
 
     @BeforeEach
     public void testBefore() {
@@ -51,10 +54,12 @@ public class PostServiceTest {
         Long memberId = memberService.findByEmail("Test@naver.com").getId();
 
         //when
-        Long createdPostId = postService.createPost(memberId, postRequestDto);
+        Post post = postService.createPost(memberId, postRequestDto);
 
         //then
-        assertNotNull(createdPostId);
+        assertNotNull(post);
+        assertEquals(postRequestDto.getTitle(), post.getTitle());
+        assertEquals(postRequestDto.getContent(), post.getContent());
     }
 
     @Test
@@ -62,17 +67,17 @@ public class PostServiceTest {
         //given
         PostRequestDto postRequestDto = new PostRequestDto("title", "content");
         Long memberId = memberService.findByEmail("Test@naver.com").getId();
-        Long createdPostId = postService.createPost(memberId, postRequestDto);
+        Post post = postService.createPost(memberId, postRequestDto);
 
         PostRequestDto postUpdateDto = new PostRequestDto("updateTitle", "updateContent");
         //when
-        Long updatePostId = postService.updatePost(createdPostId, postUpdateDto);
-        Post post = postService.findOne(updatePostId);
+        Post updatePost = postService.updatePost(post.getId(), postUpdateDto);
+
 
         // then
-        assertNotNull(updatePostId);
-        assertEquals(postUpdateDto.getTitle(), post.getTitle());
-        assertEquals(postUpdateDto.getContent(), post.getContent());
+        assertNotNull(updatePost.getId());
+        assertEquals(postUpdateDto.getTitle(), updatePost.getTitle());
+        assertEquals(postUpdateDto.getContent(), updatePost.getContent());
 
     }
 
@@ -81,14 +86,15 @@ public class PostServiceTest {
         //given
         PostRequestDto postRequestDto = new PostRequestDto("title", "content");
         Long memberId = memberService.findByEmail("Test@naver.com").getId();
-        Long createdPostId = postService.createPost(memberId, postRequestDto);
+        Post post = postService.createPost(memberId, postRequestDto);
+
 
         //when
-        postService.deletePost(createdPostId);
+        postService.deletePost(post.getId());
 
         //then
         assertThrows(PostNotFoundException.class, () -> {
-            postService.findOne(createdPostId);
+            postService.findOne(post.getId());
         });
 
     }

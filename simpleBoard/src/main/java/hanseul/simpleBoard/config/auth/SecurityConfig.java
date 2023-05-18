@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,6 +20,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity // Spring Security 설정 활성화
 @RequiredArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true) //@PreAuthorize @PostAuthorize 활성화
 public class SecurityConfig{
 
     @Bean
@@ -32,7 +34,7 @@ public class SecurityConfig{
         http
                 .csrf().disable().cors().disable()  //csrf와 cors disable
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/status", "/", "/home", "/signup", "/member", "/profile").permitAll()
+                        .requestMatchers("/status", "/", "/home", "/signup", "/api/members", "/profile").permitAll()
                         //로그인 안 해도 위 url들은 접근 가능
                         .anyRequest().authenticated() // 어떠한 요청이라도 인증이 필요
                 )
@@ -44,9 +46,14 @@ public class SecurityConfig{
                         .defaultSuccessUrl("/posts", true) //성공시
                         .failureUrl("/login") //로그인 실패시
                         .permitAll()  // 로그인 페이지 이동이 막히면 안되므로 관련된애들 모두 허용
+
                 )
-                .logout(withDefaults());  // 로그아웃은 기본설정으로 (/logout으로 인증해제)
+                .logout(withDefaults())  // 로그아웃은 기본설정으로 (/logout으로 인증해제)
                 //.logout((logout) -> logout.permitAll());
+
+                .httpBasic()//postman 사용시 필요
+                ;
+
 
         return http.build();
     }

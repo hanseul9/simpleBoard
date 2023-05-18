@@ -1,0 +1,74 @@
+<!--게시글 조회-->
+
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Post Detail</title>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const postId = urlParams.get('postId');
+
+      fetch(`/api/posts/${postId}`)
+              .then(response => response.json())
+              .then(data => {
+                console.log(data);
+                const post = data.data;
+                console.log(post.owner);
+
+                document.getElementById('post-title').innerText = '제목: ' + post.title;
+                document.getElementById('post-content').innerText = '내용: ' + post.content;
+                document.getElementById('post-writer').innerText = '글쓴이: ' + post.writerName;
+                document.getElementById('post-postedAt').innerText = '글쓴 시간: ' + new Date(post.postedAt).toLocaleString();
+
+                if (post.owner) {
+                  document.getElementById('edit-button').style.display = 'inline-block';
+                  document.getElementById('delete-button').style.display = 'inline-block';
+                } else {
+                  document.getElementById('edit-button').style.display = 'none';
+                  document.getElementById('delete-button').style.display = 'none';
+                }
+              })
+              .catch(error => {
+                console.error('게시글 정보를 가져오는 중 오류가 발생했습니다.', error);
+              });
+
+      document.getElementById('delete-button').onclick = function() {
+        fetch(`/api/posts/${postId}`, { method: 'DELETE' })
+                .then(response => {
+                  if (response.status === 406) {
+                    alert('해당 포스트에 대한 접근 권한이 없습니다.');
+                    return;
+                  }
+
+                  if (response.ok) {
+                    alert('게시글이 성공적으로 삭제되었습니다.');
+                    window.location.href = '/posts';
+                  }
+                })
+                .catch(error => {
+                  console.error('게시글 삭제 중 오류가 발생했습니다.', error);
+                });
+      };
+
+      document.getElementById('edit-button').onclick = function() {
+        window.location.href = `/posting?postId=${postId}`;
+      };
+
+    });
+  </script>
+</head>
+<body>
+<h1 id="post-title"></h1>
+<p id="post-content"></p>
+<p id="post-writer"></p>
+<p id="post-postedAt"></p>
+
+<!-- 수정 버튼 -->
+<button id="edit-button" style="display: none;">글 수정</button>
+
+<!-- 삭제 버튼 -->
+<button id="delete-button" style="display: none;">글 삭제</button>
+</body>
+</html>

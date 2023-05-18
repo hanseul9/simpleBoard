@@ -4,10 +4,7 @@ import hanseul.simpleBoard.requestdto.member.MemberLoginDto;
 import hanseul.simpleBoard.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.awt.*;
 
@@ -33,20 +30,18 @@ public class WebController {
         return "signup";
     }
 
-//    @PostMapping("/login-process") //로그인 정보를 받음
-//    public String login(MemberLoginDto dto) {
-//        boolean isValidMember = memberService.isValidMember(dto.getEmail(), dto.getPassword());
-//        if (isValidMember) //로그인 성공시
-//            return "login";
-//        return "login"; //로그인 실패시
-//    }
 
-    @GetMapping("/posts")
+    @GetMapping("/posts") // 글 목록들
     public String getPostTitles() {
         return "posts";
     }
 
-    @GetMapping("/posting")
+    @GetMapping("/postDetail") // 게시글 열람
+    public String getPost() {
+        return "postDetail";
+    }
+
+    @GetMapping("/posting") //글쓰기 페이지
     public String writePost() {
         return "posting";
     }

@@ -30,7 +30,7 @@ public class InitDb implements CommandLineRunner {
     private void loadData() {
         // Create sample members
         String encodedPassword = passwordEncoder.encode("password4");
-        Member member1 = new Member("test", "test1@naver.com", encodedPassword);
+        Member member1 = new Member("member1", "test1@naver.com", encodedPassword);
         Member member2 = new Member("Alice", "alice@example.com", encodedPassword);
         Member member3= new Member("Bob", "bob@example.com", encodedPassword);
 
@@ -47,9 +47,10 @@ public class InitDb implements CommandLineRunner {
         postRepository.save(post2);
         postRepository.save(post3);
 
-        for (int i = 1; i <= 100; i++) { //더미데이터 생성
-            postRepository.save(new Post("Hello world!", "포스팅1", member1));
-        }
+//        for (int i = 1; i <= 20; i++) { //더미데이터 생성
+//            postRepository.save(new Post("Hello world!", "포스팅1", member1));
+//
+//        }
 
     }
 }

@@ -1,5 +1,6 @@
 package hanseul.simpleBoard.controller;
 
+import hanseul.simpleBoard.config.auth.CustomSecurityUtil;
 import hanseul.simpleBoard.domain.Member;
 import hanseul.simpleBoard.requestdto.member.MemberCreateDto;
 import hanseul.simpleBoard.responsedto.BasicResponse;
@@ -25,8 +26,9 @@ public class MemberController {
     private static final int CREATED = 201;
 
     private final MemberService memberService;
+    private final CustomSecurityUtil customSecurityUtil;
 
-    @PostMapping ("/member")//회원가입
+    @PostMapping ("/members")//회원가입
     public ResponseEntity<JoinMemberResponse> createMember(@Valid @RequestBody MemberCreateDto memberCreateDto) {
 
         Long memberId = memberService.createMember(memberCreateDto);
@@ -34,18 +36,17 @@ public class MemberController {
         return new ResponseEntity<>(joinMemberResponse, HttpStatus.CREATED);
     }
 
-    @GetMapping("/member") //로그인한 회원 조회 api
+    @GetMapping("/members") //로그인한 회원 조회 api
     public ResponseEntity<BasicResponse> getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        Member member = memberService.findByEmail(email);
+        Long memberId = customSecurityUtil.getMemberId();
+        Member member = memberService.findOne(memberId);
         GetMemberResponseDto getMemberResponseDto = new GetMemberResponseDto(member);
         BasicResponse basicResponse = new BasicResponse<>("회원 조회 성공", getMemberResponseDto);
         return new ResponseEntity<>(basicResponse, HttpStatus.OK);
     }
     @PostMapping("/logout") //로그아웃
     public ResponseEntity<BasicResponse> logout(HttpServletRequest request, HttpServletResponse response) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication authentication = customSecurityUtil.getAuthentication();
         if (authentication != null) {
             new SecurityContextLogoutHandler().logout(request, response, authentication);
         }
@@ -54,11 +55,11 @@ public class MemberController {
     }
 
 
-    @GetMapping("/member/{memberId}") //회원 단건 조회
-    public ResponseEntity<BasicResponse> getMemberById(@PathVariable("memberId") Long memberId) {
+    @GetMapping("/members/{memberId}") //회원 단건 조회
+    public ResponseEntity<BasicResponse<GetMemberResponseDto>> getMemberById(@PathVariable("memberId") Long memberId) {
         Member member = memberService.findOne(memberId);
         GetMemberResponseDto getMemberResponseDto = new GetMemberResponseDto(member);
-        BasicResponse basicResponse = new BasicResponse<>("회원 조회 성공", getMemberResponseDto);
+        BasicResponse<GetMemberResponseDto> basicResponse = new BasicResponse<>("회원 조회 성공", getMemberResponseDto);
         return new ResponseEntity<>(basicResponse, HttpStatus.OK);
     }
 

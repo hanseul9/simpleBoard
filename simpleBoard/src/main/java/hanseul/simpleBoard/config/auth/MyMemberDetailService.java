@@ -26,11 +26,18 @@ public class MyMemberDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Member member  = memberService.findByEmail(email);
 
-        return User.builder()
-                .username(member.getEmail())
-                .password(member.getPassword())
-                .roles("USER")
-                .build();
+        return new CustomUserDetails(
+                member.getId(),
+                member.getEmail(),
+                member.getPassword(),
+                member.getName()
+        );
+
+//        return User.builder()
+//                .username(member.getEmail())
+//                .password(member.getPassword())
+//                .roles("USER")
+//                .build();
     }
 
 

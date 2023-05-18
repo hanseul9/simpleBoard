@@ -1,55 +1,74 @@
+<!--글쓰는 View -->
+
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Posting</title>
+    <title>Post</title>
+    <script>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const postId = urlParams.get('postId');
+
+            // 만약 postId가 있다면, 이 페이지는 '글 수정' 모드입니다.
+            if (postId) {
+                fetch(`/api/posts/${postId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('title').value = data.data.title;
+                        document.getElementById('content').value = data.data.content;
+                    });
+
+                document.getElementById('submit-button').innerText = '수정하기';
+
+                document.getElementById('submit-button').onclick = () => {
+                    const title = document.getElementById('title').value;
+                    const content = document.getElementById('content').value;
+
+                    fetch(`/api/posts/${postId}`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ title, content }),
+                    }).then(response => {
+                        if (response.ok) {
+                            alert('게시글이 성공적으로 수정되었습니다.');
+                            window.location.href = `/postDetail?postId=${postId}`;
+                        }
+                    });
+                };
+            }
+            // 그렇지 않다면, 이 페이지는 '글 작성' 모드입니다.
+            else {
+                document.getElementById('submit-button').innerText = '작성하기';
+
+                document.getElementById('submit-button').onclick = () => {
+                    const title = document.getElementById('title').value;
+                    const content = document.getElementById('content').value;
+
+                    fetch(`/api/posts`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ title, content }),
+                    }).then(response => {
+                        if (response.ok) {
+                            alert('게시글이 성공적으로 생성되었습니다.');
+                            window.location.href = '/posts';
+                        }
+                    });
+                };
+            }
+        });
+    </script>
 </head>
 <body>
-<h1>Posting</h1>
-<form onsubmit="postJson(event)">
-    <div>
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title"/>
-    </div>
-    <div>
-        <label for="content">Content:</label>
-        <textarea id="content" name="content"></textarea>
-    </div>
-    <button type="submit">Post</button>
-</form>
-
-<script>
-    function postJson(event) {
-        event.preventDefault(); // prevent form submission
-
-        let title = document.getElementById('title').value;
-        let content = document.getElementById('content').value;
-        let writerId = /* get the current member's ID */;
-
-        let post = {
-            title: title,
-            content: content,
-            writerId: writerId
-        };
-
-        fetch('/api/posts', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(post)
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(response.statusText);
-                }
-                // redirect to the home page
-                window.location.href = '/';
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-</script>
+<input id="title" type="text" placeholder="제목을 입력하세요.">
+<input id="content" type="text" placeholder="내용을 입력하세요.">
+<button id="submit-button">작성하기</button>
 </body>
 </html>
+
+

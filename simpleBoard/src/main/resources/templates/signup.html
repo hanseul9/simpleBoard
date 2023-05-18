@@ -6,7 +6,7 @@
 </head>
 <body>
 <h2>Signup Form</h2>
-<form id="signupForm" method="post" th:action="@{/member}">
+<form id="signupForm" method="post" th:action="@{/members}">
   <div>
     <label for="email">Email:</label>
     <input type="email" id="email" name="email"/>
@@ -35,7 +35,7 @@
     };
 
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/member");
+    xhr.open("POST", "/members");
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     xhr.onreadystatechange = function() {

@@ -28,20 +28,20 @@ public class PostService {
     }
 
     @Transactional
-    public Long createPost(Long memberId, PostRequestDto postRequestDto) {
+    public Post createPost(Long memberId, PostRequestDto postRequestDto) {
         Member member = memberService.findOne(memberId);
         Post post = new Post(postRequestDto.getTitle(), postRequestDto.getContent(), member);
         postRepository.save(post);
-        return post.getId();
+        return post;
     }
 
     @Transactional
-    public Long updatePost(Long postId, PostRequestDto postRequestDto) {
+    public Post updatePost(Long postId, PostRequestDto postRequestDto) {
         Post post = findOne(postId);
 
         post.update(postRequestDto);
 
-        return post.getId();
+        return post;
     }
 
     @Transactional
