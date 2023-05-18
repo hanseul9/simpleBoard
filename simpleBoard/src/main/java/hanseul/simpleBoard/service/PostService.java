@@ -23,8 +23,17 @@ public class PostService {
                 .orElseThrow(() -> new PostNotFoundException(postId));
     }
 
-    public Page<Post> findAllByOrderByPostedAtDesc(Pageable pageable) {
-        return postRepository.findAllByOrderByPostedAtDesc(pageable);
+    public Page<Post> findAllByOrderByPostedAtDescIdDesc(Pageable pageable) { // 전체 포스트 id 기준 오름차순
+        return postRepository.findAllByOrderByPostedAtDescIdDesc(pageable);
+    }
+
+    public Page<Post> findAllByOrderByPostedAtDescIdAsc(Pageable pageable) { // 전체 포스트 id 기준내림차순
+        return postRepository.findAllByOrderByPostedAtDescIdAsc(pageable);
+    }
+
+    public Page<Post> findByMemberIdOrderByPostedAtDescIdAsc(Pageable pageable, Long memberId) {
+        // 특정 회원 포스트 id 기준 내림차순 + 패치조인
+        return postRepository.findByMemberIdOrderByPostedAtDescIdAsc(memberId, pageable);
     }
 
     @Transactional
@@ -39,7 +48,7 @@ public class PostService {
     public Post updatePost(Long postId, PostRequestDto postRequestDto) {
         Post post = findOne(postId);
 
-        post.update(postRequestDto);
+        post.update(postRequestDto.getTitle(), postRequestDto.getContent());
 
         return post;
     }

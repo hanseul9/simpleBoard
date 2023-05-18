@@ -8,14 +8,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
-public class GetMemberResponseDto {
+public class MemberGetResponseDto {
 
     private Long id;
     private String name;
     private String email;
     private List<PostDto> postList;
 
-    public GetMemberResponseDto(Member member) {
+    public MemberGetResponseDto(Member member) {
         id = member.getId();
         name = member.getName();
         email = member.getEmail();

@@ -2,10 +2,12 @@ package hanseul.simpleBoard.responsedto.post;
 
 import hanseul.simpleBoard.domain.Post;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Data
+@NoArgsConstructor
 public class PostDto {
     private Long id;
     private String title;

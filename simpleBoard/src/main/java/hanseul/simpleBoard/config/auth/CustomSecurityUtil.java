@@ -1,7 +1,9 @@
 package hanseul.simpleBoard.config.auth;
 
+import hanseul.simpleBoard.domain.Comment;
 import hanseul.simpleBoard.domain.Member;
 import hanseul.simpleBoard.domain.Post;
+import hanseul.simpleBoard.service.CommentService;
 import hanseul.simpleBoard.service.MemberService;
 import hanseul.simpleBoard.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class CustomSecurityUtil{
 
     private final MemberService memberService;
     private final PostService postService;
+    private final CommentService commentService;
 
 
     // 현재 인증된 사용자의 정보를 가져오는 메소드
@@ -56,8 +59,6 @@ public class CustomSecurityUtil{
         Long memberId = getMemberId();
         Post post = postService.findOne(postId);
 
-        System.out.println("memberId = " + memberId);
-        System.out.println("post.getMember().getId() = " + post.getMember().getId());
 
         if (memberId.equals(post.getMember().getId())) {
             return true;
@@ -65,8 +66,18 @@ public class CustomSecurityUtil{
         else{
             throw new AccessDeniedException("해당 포스트에 대한 접근 권한이 없습니다.");
         }
+    }
 
+    public boolean isCommentOwner(Long commentId) {
+        Long memberId = getMemberId();
+        Comment comment = commentService.findOne(commentId);
 
+        if (memberId.equals(comment.getMember().getId())) {
+            return true;
+        }
+        else{
+            throw new AccessDeniedException("해당 댓글 대한 접근 권한이 없습니다.");
+        }
     }
 
 

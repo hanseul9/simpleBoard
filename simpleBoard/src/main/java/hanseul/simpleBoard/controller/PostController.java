@@ -1,12 +1,17 @@
 package hanseul.simpleBoard.controller;
 
 import hanseul.simpleBoard.config.auth.CustomSecurityUtil;
+import hanseul.simpleBoard.domain.Comment;
+import hanseul.simpleBoard.domain.Member;
 import hanseul.simpleBoard.domain.Post;
+import hanseul.simpleBoard.requestdto.comment.CommentRequestDto;
 import hanseul.simpleBoard.requestdto.post.PostRequestDto;
 import hanseul.simpleBoard.responsedto.BasicResponse;
+import hanseul.simpleBoard.responsedto.comment.CommentGetResponseDto;
 import hanseul.simpleBoard.responsedto.post.PostDto;
 import hanseul.simpleBoard.responsedto.post.PostListDto;
 import hanseul.simpleBoard.responsedto.post.PostGetDto;
+import hanseul.simpleBoard.service.CommentService;
 import hanseul.simpleBoard.service.MemberService;
 import hanseul.simpleBoard.service.PostService;
 import jakarta.validation.Valid;
@@ -33,12 +38,13 @@ public class PostController {
 
     private final PostService postService;
     private final MemberService memberService;
+    private final CommentService commentService;
     private final CustomSecurityUtil customSecurityUtil;
 
-    @GetMapping("/posts")
+    @GetMapping("/posts") // 게시글들 조회
     public ResponseEntity<Page<PostListDto>> getPostTitles(@RequestParam(value = "page", defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 10);
-        Page<Post> posts = postService.findAllByOrderByPostedAtDesc(pageable);
+        Page<Post> posts = postService.findAllByOrderByPostedAtDescIdDesc(pageable);
         List<PostListDto> postListDtos = posts.getContent().stream()
                 .map(PostListDto::new)
                 .collect(Collectors.toList());
@@ -46,7 +52,7 @@ public class PostController {
         return new ResponseEntity<>(postList, HttpStatus.OK);
     }
 
-    @GetMapping("/posts/{postId}")
+    @GetMapping("/posts/{postId}") // 게시글 단건조회
     public ResponseEntity<BasicResponse<PostGetDto>> getPost(@PathVariable Long postId) {
         Long memberId = customSecurityUtil.getMemberId();
         Post post = postService.findOne(postId);
@@ -55,7 +61,7 @@ public class PostController {
         return new ResponseEntity<>(basicResponse, HttpStatus.CREATED);
     }
 
-    @PostMapping("/posts")
+    @PostMapping("/posts") // 게시글 작성
     public ResponseEntity<BasicResponse<PostDto>> createPost(@Valid @RequestBody PostRequestDto postRequestDto) {
         Long memberId = customSecurityUtil.getMemberId();
         Post post = postService.createPost(memberId, postRequestDto);
@@ -64,7 +70,7 @@ public class PostController {
         return new ResponseEntity<>(basicResponse, HttpStatus.CREATED);
     }
 
-    @PatchMapping("/posts/{postId}")
+    @PatchMapping("/posts/{postId}") // 게시글 수정
     @PreAuthorize("@customSecurityUtil.isPostOwner(#postId)")
     public ResponseEntity<BasicResponse<PostGetDto>> updatePost(@PathVariable Long postId,
                                                              @Valid @RequestBody PostRequestDto postRequestDto) {
@@ -75,11 +81,57 @@ public class PostController {
         return new ResponseEntity<>(basicResponse, HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/posts/{postId}")
+    @DeleteMapping("/posts/{postId}") // 게시글 삭제
     @PreAuthorize("@customSecurityUtil.isPostOwner(#postId)")
     public ResponseEntity<BasicResponse> deletePost(@PathVariable Long postId) {
         postService.deletePost(postId);
         BasicResponse memberBasicResponse = new BasicResponse("게시글 삭제 완료", null);
         return new ResponseEntity<>(memberBasicResponse, HttpStatus.OK);
     }
+
+    //-----------------------------
+
+    /*
+    댓글
+     */
+
+    @PostMapping("/posts/{postId}/comments") // 댓글 달기
+    public ResponseEntity<BasicResponse<CommentGetResponseDto>> createComment(@PathVariable Long postId,
+                                                                              @Valid @RequestBody CommentRequestDto commentDto) {
+
+        Long memberId = customSecurityUtil.getMemberId();
+        Member member = memberService.findOne(memberId);
+        Post post = postService.findOne(postId);
+        Comment comment = commentService.createComment(post, member, commentDto);
+        CommentGetResponseDto commentResponseDto = new CommentGetResponseDto(comment);
+
+        BasicResponse<CommentGetResponseDto> basicResponse
+                = new BasicResponse<>("댓글 생성 완료", commentResponseDto);
+        return new ResponseEntity<>(basicResponse, HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/posts/{postId}/comments/{commentId}") //댓글 삭제
+    @PreAuthorize("@customSecurityUtil.isCommentOwner(#commentId)")
+    public ResponseEntity<BasicResponse> deleteComment(@PathVariable Long postId,
+                                                         @PathVariable Long commentId) {
+
+        commentService.deleteComment(commentId);
+        BasicResponse memberBasicResponse = new BasicResponse("게시글 삭제 완료", null);
+        return new ResponseEntity<>(memberBasicResponse, HttpStatus.OK);
+    }
+
+    @PatchMapping("/posts/{postId}/comments/{commentId}") //댓글 수정
+    @PreAuthorize("@customSecurityUtil.isCommentOwner(#commentId)")
+    public ResponseEntity<BasicResponse> updateComment(@PathVariable Long postId,
+                                                       @PathVariable Long commentId,
+                                                       @Valid @RequestBody CommentRequestDto commentDto) {
+
+        Comment comment = commentService.updateComment(commentId, commentDto);
+        CommentGetResponseDto commentResponseDto = new CommentGetResponseDto(comment);
+        BasicResponse<CommentGetResponseDto> basicResponse
+                = new BasicResponse<>("댓글 수정 완료", commentResponseDto);
+        return new ResponseEntity<>(basicResponse, HttpStatus.OK);
+    }
+
+
 }

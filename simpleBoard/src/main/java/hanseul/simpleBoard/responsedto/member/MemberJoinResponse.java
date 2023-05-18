@@ -6,8 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class JoinMemberResponse {
+public class MemberJoinResponse {
     private Long id;
     private Integer status;
     private String message;

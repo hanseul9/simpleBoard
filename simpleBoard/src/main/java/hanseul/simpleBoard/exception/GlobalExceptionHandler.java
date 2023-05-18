@@ -1,5 +1,6 @@
 package hanseul.simpleBoard.exception;
 
+import hanseul.simpleBoard.exception.comment.CommentNotFoundException;
 import hanseul.simpleBoard.exception.member.DuplicateEmailException;
 import hanseul.simpleBoard.exception.member.MemberNotFoundException;
 import hanseul.simpleBoard.exception.post.PostNotFoundException;
@@ -45,6 +46,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(PostNotFoundException.class)
     public ResponseEntity<ErrorBasicResponse> handleMemberNotFoundException(PostNotFoundException ex) {
+        ErrorBasicResponse errorResponse = new ErrorBasicResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<ErrorBasicResponse> handleCommentNotFoundException(CommentNotFoundException ex) {
         ErrorBasicResponse errorResponse = new ErrorBasicResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
