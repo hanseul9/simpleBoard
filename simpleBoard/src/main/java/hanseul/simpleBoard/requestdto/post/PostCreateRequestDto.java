@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostRequestDto {
+public class PostCreateRequestDto {
 
     @Size(max = 100, message = "제목이 너무 깁니다. 영어 기준 100자, 한글 기준 30자 까지 허용")
     @NotBlank(message = "제목이 누락되었습니다.")

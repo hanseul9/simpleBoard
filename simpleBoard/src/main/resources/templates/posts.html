@@ -76,6 +76,9 @@
         function goToPosting() {
             window.location.href = '/posting';
         }
+        function goToMyRoom() {
+            window.location.href = '/myRoom';
+        }
 
         function showPostDetail(postId) {
             window.location.href = `/postDetail?postId=${postId}`;
@@ -90,6 +93,7 @@
     <p id="current-user"></p>
     <button onclick="logout()">로그아웃</button>
     <button onclick="goToPosting()">새 글 쓰기</button>
+    <button onclick="goToPosting()">마이룸</button>
 </div>
 <div>
     <table id="posts-table">

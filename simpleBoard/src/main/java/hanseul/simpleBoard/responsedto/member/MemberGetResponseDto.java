@@ -2,12 +2,16 @@ package hanseul.simpleBoard.responsedto.member;
 
 import hanseul.simpleBoard.domain.Member;
 import hanseul.simpleBoard.responsedto.post.PostDto;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class MemberGetResponseDto {
 
     private Long id;

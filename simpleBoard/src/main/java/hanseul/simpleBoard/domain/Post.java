@@ -1,6 +1,5 @@
 package hanseul.simpleBoard.domain;
 
-import hanseul.simpleBoard.requestdto.post.PostRequestDto;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

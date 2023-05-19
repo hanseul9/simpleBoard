@@ -3,6 +3,7 @@ package hanseul.simpleBoard.exception;
 import hanseul.simpleBoard.exception.comment.CommentNotFoundException;
 import hanseul.simpleBoard.exception.member.DuplicateEmailException;
 import hanseul.simpleBoard.exception.member.MemberNotFoundException;
+import hanseul.simpleBoard.exception.member.MemberPasswordIncorrectException;
 import hanseul.simpleBoard.exception.post.PostNotFoundException;
 import hanseul.simpleBoard.responsedto.ErrorBasicResponse;
 import org.springframework.http.HttpStatus;
@@ -38,25 +39,31 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(MemberNotFoundException.class)
+    @ExceptionHandler(MemberNotFoundException.class) //회원찾기 실패
     public ResponseEntity<ErrorBasicResponse> handleMemberNotFoundException(MemberNotFoundException ex) {
         ErrorBasicResponse errorResponse = new ErrorBasicResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<ErrorBasicResponse> handleMemberNotFoundException(PostNotFoundException ex) {
+    @ExceptionHandler(MemberPasswordIncorrectException.class) //회원 비밀번호 오류
+    public ResponseEntity<ErrorBasicResponse> handleMemberPasswordIncorrectException(MemberPasswordIncorrectException ex) {
+        ErrorBasicResponse errorResponse = new ErrorBasicResponse(HttpStatus.UNAUTHORIZED.value(), ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(PostNotFoundException.class) //게시글 찾기 실패
+    public ResponseEntity<ErrorBasicResponse> handlePostNotFoundException(PostNotFoundException ex) {
         ErrorBasicResponse errorResponse = new ErrorBasicResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(CommentNotFoundException.class)
+    @ExceptionHandler(CommentNotFoundException.class) //댓글 찾기 실패
     public ResponseEntity<ErrorBasicResponse> handleCommentNotFoundException(CommentNotFoundException ex) {
         ErrorBasicResponse errorResponse = new ErrorBasicResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(DuplicateEmailException.class)
+    @ExceptionHandler(DuplicateEmailException.class) //이메일 중복 예외
     public ResponseEntity<ErrorBasicResponse>  handleDuplicateEmailException( DuplicateEmailException ex) {
         ErrorBasicResponse errorResponse = new ErrorBasicResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);

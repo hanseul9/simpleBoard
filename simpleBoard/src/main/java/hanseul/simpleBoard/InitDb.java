@@ -10,7 +10,7 @@ import hanseul.simpleBoard.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
-import hanseul.simpleBoard.requestdto.comment.CommentRequestDto;
+import hanseul.simpleBoard.requestdto.comment.CommentCreateRequestDto;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -51,8 +51,8 @@ public class InitDb implements CommandLineRunner {
         postRepository.save(post2);
         postRepository.save(post3);
 
-        CommentRequestDto commentDto
-                = new CommentRequestDto("member1이 쓸 댓글 내용입니다.");
+        CommentCreateRequestDto commentDto
+                = new CommentCreateRequestDto("member1이 쓸 댓글 내용입니다.");
 
         Comment comment = new Comment(post1, member1, commentDto.getContent());
         commentRepository.save(comment);

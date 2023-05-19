@@ -1,19 +1,16 @@
 package hanseul.simpleBoard.service;
 
 import hanseul.simpleBoard.domain.Post;
-import hanseul.simpleBoard.exception.member.MemberNotFoundException;
 import hanseul.simpleBoard.exception.post.PostNotFoundException;
 import hanseul.simpleBoard.repository.MemberRepository;
 import hanseul.simpleBoard.repository.PostRepository;
 import hanseul.simpleBoard.requestdto.member.MemberCreateDto;
-import hanseul.simpleBoard.requestdto.post.PostRequestDto;
-import jakarta.persistence.EntityManager;
+import hanseul.simpleBoard.requestdto.post.PostCreateRequestDto;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -50,26 +47,26 @@ public class PostServiceTest {
     @Test
     public void 페이지_생성() {
         //given
-        PostRequestDto postRequestDto = new PostRequestDto("title", "content");
+        PostCreateRequestDto postCreateRequestDto = new PostCreateRequestDto("title", "content");
         Long memberId = memberService.findByEmail("Test@naver.com").getId();
 
         //when
-        Post post = postService.createPost(memberId, postRequestDto);
+        Post post = postService.createPost(memberId, postCreateRequestDto);
 
         //then
         assertNotNull(post);
-        assertEquals(postRequestDto.getTitle(), post.getTitle());
-        assertEquals(postRequestDto.getContent(), post.getContent());
+        assertEquals(postCreateRequestDto.getTitle(), post.getTitle());
+        assertEquals(postCreateRequestDto.getContent(), post.getContent());
     }
 
     @Test
     public void 페이지_업데이트() {
         //given
-        PostRequestDto postRequestDto = new PostRequestDto("title", "content");
+        PostCreateRequestDto postCreateRequestDto = new PostCreateRequestDto("title", "content");
         Long memberId = memberService.findByEmail("Test@naver.com").getId();
-        Post post = postService.createPost(memberId, postRequestDto);
+        Post post = postService.createPost(memberId, postCreateRequestDto);
 
-        PostRequestDto postUpdateDto = new PostRequestDto("updateTitle", "updateContent");
+        PostCreateRequestDto postUpdateDto = new PostCreateRequestDto("updateTitle", "updateContent");
         //when
         Post updatePost = postService.updatePost(post.getId(), postUpdateDto);
 
@@ -84,9 +81,9 @@ public class PostServiceTest {
     @Test
     public void 페이지_삭제() {
         //given
-        PostRequestDto postRequestDto = new PostRequestDto("title", "content");
+        PostCreateRequestDto postCreateRequestDto = new PostCreateRequestDto("title", "content");
         Long memberId = memberService.findByEmail("Test@naver.com").getId();
-        Post post = postService.createPost(memberId, postRequestDto);
+        Post post = postService.createPost(memberId, postCreateRequestDto);
 
 
         //when

@@ -3,6 +3,7 @@ package hanseul.simpleBoard.service;
 import hanseul.simpleBoard.domain.Member;
 import hanseul.simpleBoard.exception.member.DuplicateEmailException;
 import hanseul.simpleBoard.exception.member.MemberNotFoundException;
+import hanseul.simpleBoard.exception.member.MemberPasswordIncorrectException;
 import hanseul.simpleBoard.repository.MemberRepository;
 import hanseul.simpleBoard.requestdto.member.MemberCreateDto;
 import hanseul.simpleBoard.requestdto.member.MemberUpdateDto;
@@ -46,18 +47,22 @@ public class MemberService {
     }
 
     @Transactional
-    public Long updateMember(Long memberId, MemberUpdateDto memberUpdateDto) { // 회원정보 변경
+    public Member updateMember(Long memberId, MemberUpdateDto memberUpdateDto) { // 회원정보 변경
         Member member = findOne(memberId);
 
+        if (!passwordEncoder.matches(memberUpdateDto.getOldPassword(), member.getPassword())) {
+            throw new MemberPasswordIncorrectException();
+        }
+
         String email = memberUpdateDto.getEmail();
-        String password = memberUpdateDto.getPassword();
+        String password = passwordEncoder.encode(memberUpdateDto.getNewPassword());
         String name = memberUpdateDto.getName();
 
         if (email != null || password != null || name != null) {
             member.update(email, password, name);
             memberRepository.save(member);
         }
-        return member.getId();
+        return member;
     }
 
     @Transactional

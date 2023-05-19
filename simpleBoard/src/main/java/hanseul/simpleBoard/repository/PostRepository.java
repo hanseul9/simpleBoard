@@ -22,7 +22,7 @@ public interface PostRepository extends JpaRepository<Post, Long>,
     @Query("SELECT p FROM Post p WHERE p.member.id = :memberId ORDER BY p.postedAt ASC")
     Page<Post> findByMemberIdOrderByPostedAtDescIdAsc(Long memberId, Pageable pageable);
 
-    @Query("SELECT p FROM Post p JOIN FETCH p.member WHERE p.id IN :ids")
+    @Query("SELECT p FROM Post p JOIN FETCH p.member WHERE p.id IN :ids") //postId를 기반으로 Fetch Join
     List<Post> findAllByIdsWithFetchJoin(Collection<Long> ids);
 
 }

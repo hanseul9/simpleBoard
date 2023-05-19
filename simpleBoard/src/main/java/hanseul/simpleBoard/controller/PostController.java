@@ -4,8 +4,10 @@ import hanseul.simpleBoard.config.auth.CustomSecurityUtil;
 import hanseul.simpleBoard.domain.Comment;
 import hanseul.simpleBoard.domain.Member;
 import hanseul.simpleBoard.domain.Post;
-import hanseul.simpleBoard.requestdto.comment.CommentRequestDto;
-import hanseul.simpleBoard.requestdto.post.PostRequestDto;
+import hanseul.simpleBoard.requestdto.comment.CommentCreateRequestDto;
+import hanseul.simpleBoard.requestdto.comment.CommentUpdateRequestDto;
+import hanseul.simpleBoard.requestdto.post.PostCreateRequestDto;
+import hanseul.simpleBoard.requestdto.post.PostUpdateRequestDto;
 import hanseul.simpleBoard.responsedto.BasicResponse;
 import hanseul.simpleBoard.responsedto.comment.CommentGetResponseDto;
 import hanseul.simpleBoard.responsedto.post.PostDto;
@@ -44,11 +46,8 @@ public class PostController {
     @GetMapping("/posts") // 게시글들 조회
     public ResponseEntity<Page<PostListDto>> getPostTitles(@RequestParam(value = "page", defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 10);
-        Page<Post> posts = postService.findAllByOrderByPostedAtDescIdDesc(pageable);
-        List<PostListDto> postListDtos = posts.getContent().stream()
-                .map(PostListDto::new)
-                .collect(Collectors.toList());
-        PageImpl<PostListDto> postList = new PageImpl<>(postListDtos, pageable, posts.getTotalElements());
+        Page<PostListDto> postList = postService.findAllByOrderByPostedAtDescIdDesc(pageable)
+                .map(PostListDto::new);
         return new ResponseEntity<>(postList, HttpStatus.OK);
     }
 
@@ -62,9 +61,9 @@ public class PostController {
     }
 
     @PostMapping("/posts") // 게시글 작성
-    public ResponseEntity<BasicResponse<PostDto>> createPost(@Valid @RequestBody PostRequestDto postRequestDto) {
+    public ResponseEntity<BasicResponse<PostDto>> createPost(@Valid @RequestBody PostCreateRequestDto postCreateRequestDto) {
         Long memberId = customSecurityUtil.getMemberId();
-        Post post = postService.createPost(memberId, postRequestDto);
+        Post post = postService.createPost(memberId, postCreateRequestDto);
         PostDto postDto = new PostDto(post);
         BasicResponse<PostDto> basicResponse = new BasicResponse<>("포스트 생성 완료", postDto);
         return new ResponseEntity<>(basicResponse, HttpStatus.CREATED);
@@ -73,9 +72,9 @@ public class PostController {
     @PatchMapping("/posts/{postId}") // 게시글 수정
     @PreAuthorize("@customSecurityUtil.isPostOwner(#postId)")
     public ResponseEntity<BasicResponse<PostGetDto>> updatePost(@PathVariable Long postId,
-                                                             @Valid @RequestBody PostRequestDto postRequestDto) {
+                                                             @Valid @RequestBody PostUpdateRequestDto postUpdateRequestDto) {
         Long memberId = customSecurityUtil.getMemberId();
-        Post updatePost = postService.updatePost(postId, postRequestDto);
+        Post updatePost = postService.updatePost(postId, postUpdateRequestDto);
         PostGetDto postDto = new PostGetDto(updatePost, memberId);
         BasicResponse<PostGetDto> basicResponse = new BasicResponse<>("포스트 업데이트 완료", postDto);
         return new ResponseEntity<>(basicResponse, HttpStatus.CREATED);
@@ -97,7 +96,7 @@ public class PostController {
 
     @PostMapping("/posts/{postId}/comments") // 댓글 달기
     public ResponseEntity<BasicResponse<CommentGetResponseDto>> createComment(@PathVariable Long postId,
-                                                                              @Valid @RequestBody CommentRequestDto commentDto) {
+                                                                              @Valid @RequestBody CommentCreateRequestDto commentDto) {
 
         Long memberId = customSecurityUtil.getMemberId();
         Member member = memberService.findOne(memberId);
@@ -124,7 +123,7 @@ public class PostController {
     @PreAuthorize("@customSecurityUtil.isCommentOwner(#commentId)")
     public ResponseEntity<BasicResponse> updateComment(@PathVariable Long postId,
                                                        @PathVariable Long commentId,
-                                                       @Valid @RequestBody CommentRequestDto commentDto) {
+                                                       @Valid @RequestBody CommentUpdateRequestDto commentDto) {
 
         Comment comment = commentService.updateComment(commentId, commentDto);
         CommentGetResponseDto commentResponseDto = new CommentGetResponseDto(comment);

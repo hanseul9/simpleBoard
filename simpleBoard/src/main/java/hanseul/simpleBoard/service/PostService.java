@@ -4,12 +4,15 @@ import hanseul.simpleBoard.domain.Member;
 import hanseul.simpleBoard.domain.Post;
 import hanseul.simpleBoard.exception.post.PostNotFoundException;
 import hanseul.simpleBoard.repository.PostRepository;
-import hanseul.simpleBoard.requestdto.post.PostRequestDto;
+import hanseul.simpleBoard.requestdto.post.PostCreateRequestDto;
+import hanseul.simpleBoard.requestdto.post.PostUpdateRequestDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,23 +35,23 @@ public class PostService {
     }
 
     public Page<Post> findByMemberIdOrderByPostedAtDescIdAsc(Pageable pageable, Long memberId) {
-        // 특정 회원 포스트 id 기준 내림차순 + 패치조인
+        // 특정 회원 포스트 id 기준 내림차순
         return postRepository.findByMemberIdOrderByPostedAtDescIdAsc(memberId, pageable);
     }
 
     @Transactional
-    public Post createPost(Long memberId, PostRequestDto postRequestDto) {
+    public Post createPost(Long memberId, PostCreateRequestDto postCreateRequestDto) {
         Member member = memberService.findOne(memberId);
-        Post post = new Post(postRequestDto.getTitle(), postRequestDto.getContent(), member);
+        Post post = new Post(postCreateRequestDto.getTitle(), postCreateRequestDto.getContent(), member);
         postRepository.save(post);
         return post;
     }
 
     @Transactional
-    public Post updatePost(Long postId, PostRequestDto postRequestDto) {
+    public Post updatePost(Long postId, PostUpdateRequestDto postUpdateRequestDto) {
         Post post = findOne(postId);
 
-        post.update(postRequestDto.getTitle(), postRequestDto.getContent());
+        post.update(postUpdateRequestDto.getTitle(), postUpdateRequestDto.getContent());
 
         return post;
     }
