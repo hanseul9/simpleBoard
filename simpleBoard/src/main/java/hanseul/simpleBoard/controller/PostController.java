@@ -16,10 +16,10 @@ import hanseul.simpleBoard.responsedto.post.PostGetDto;
 import hanseul.simpleBoard.service.CommentService;
 import hanseul.simpleBoard.service.MemberService;
 import hanseul.simpleBoard.service.PostService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -27,8 +27,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -43,13 +43,33 @@ public class PostController {
     private final CommentService commentService;
     private final CustomSecurityUtil customSecurityUtil;
 
+//    @GetMapping("/posts") // 게시글들 조회
+//    public ResponseEntity<Page<PostListDto>> getPostTitles(@RequestParam(value = "page"
+//                                                            ,defaultValue = "0") int page) {
+//
+//        Pageable pageable = PageRequest.of(page, 10);
+//        Page<PostListDto> postList = postService.findAllByOrderByPostedAtDescIdDesc(pageable)
+//                .map(PostListDto::new);
+//        return new ResponseEntity<>(postList, HttpStatus.OK);
+//    }
+
     @GetMapping("/posts") // 게시글들 조회
-    public ResponseEntity<Page<PostListDto>> getPostTitles(@RequestParam(value = "page", defaultValue = "0") int page) {
+    public ResponseEntity<Map<String, Object>> getPostTitles(@RequestParam(value = "page",defaultValue = "0") int page) {
+
         Pageable pageable = PageRequest.of(page, 10);
         Page<PostListDto> postList = postService.findAllByOrderByPostedAtDescIdDesc(pageable)
                 .map(PostListDto::new);
-        return new ResponseEntity<>(postList, HttpStatus.OK);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("current_page", postList.getNumber());
+        response.put("total_pages", postList.getTotalPages());
+        response.put("total_elements", postList.getTotalElements());
+        response.put("content", postList.getContent());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+
 
     @GetMapping("/posts/{postId}") // 게시글 단건조회
     public ResponseEntity<BasicResponse<PostGetDto>> getPost(@PathVariable Long postId) {

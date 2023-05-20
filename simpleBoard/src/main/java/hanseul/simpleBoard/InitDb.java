@@ -54,13 +54,15 @@ public class InitDb implements CommandLineRunner {
         CommentCreateRequestDto commentDto
                 = new CommentCreateRequestDto("member1이 쓸 댓글 내용입니다.");
 
+        for (int i = 1; i <= 20; i++) { //더미데이터 생성
+            postRepository.save(new Post("Hello world!", "포스팅1", member1));
+
+        }
+
         Comment comment = new Comment(post1, member1, commentDto.getContent());
         commentRepository.save(comment);
 
-//        for (int i = 1; i <= 20; i++) { //더미데이터 생성
-//            postRepository.save(new Post("Hello world!", "포스팅1", member1));
-//
-//        }
+
 
     }
 }

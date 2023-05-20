@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>My Room</title>
+    <script>
+        function fetchMyInfo() {
+            fetch('/api/members')
+                .then(response => response.json())
+                .then(data => {
+                    let userInfo = document.getElementById('user-info');
+                    userInfo.innerHTML = `
+                        <p>ID: ${data.data.id}</p>
+                        <p>Name: ${data.data.name}</p>
+                        <p>Email: ${data.data.email}</p>
+                    `;
+
+                    let postTable = document.getElementById('post-table');
+                    postTable.innerHTML = `
+                        <tr>
+                            <th>ID</th>
+                            <th>Title</th>
+                            <th>Content</th>
+                            <th>Posted At</th>
+                            <th>Writer Name</th>
+                            <th>Delete</th>
+                        </tr>
+                    `;
+                    data.data.postList.forEach(post => {
+                        let row = document.createElement('tr');
+
+                        let idCell = document.createElement('td');
+                        idCell.innerText = post.id;
+                        row.appendChild(idCell);
+
+                        let titleCell = document.createElement('td');
+                        titleCell.innerText = post.title;
+                        row.appendChild(titleCell);
+
+                        let contentCell = document.createElement('td');
+                        contentCell.innerText = post.content;
+                        row.appendChild(contentCell);
+
+                        let postedAtCell = document.createElement('td');
+                        postedAtCell.innerText = new Date(post.postedAt).toLocaleString();
+                        row.appendChild(postedAtCell);
+
+                        let writerCell = document.createElement('td');
+                        writerCell.innerText = post.writerName;
+                        row.appendChild(writerCell);
+
+                        let deleteCell = document.createElement('td');
+                        let deleteButton = document.createElement('button');
+                        deleteButton.innerText = 'X';
+                        deleteButton.onclick = () => deletePost(data.data.id, post.id);
+                        deleteCell.appendChild(deleteButton);
+                        row.appendChild(deleteCell);
+
+                        postTable.appendChild(row);
+                    });
+
+                    let commentTable = document.getElementById('comment-table');
+                    commentTable.innerHTML = `
+                        <tr>
+                            <th>ID</th>
+                            <th>Content</th>
+                            <th>Commented At</th>
+                            <th>Writer Name</th>
+                            <th>Delete</th>
+                        </tr>
+                    `;
+                    data.data.commentList.forEach(comment => {
+                        let row = document.createElement('tr');
+
+                        let idCell = document.createElement('td');
+                        idCell.innerText = comment.id;
+                        row.appendChild(idCell);
+
+                        let contentCell = document.createElement('td');
+                        contentCell.innerText = comment.content;
+                        row.appendChild(contentCell);
+
+                        let commentedAtCell = document.createElement('td');
+                        commentedAtCell.innerText = new Date(comment.commentedAt).toLocaleString();
+                        row.appendChild(commentedAtCell);
+
+                        let writerCell = document.createElement('td');
+                        writerCell.innerText = comment.writerName;
+                        row.appendChild(writerCell);
+
+                        let deleteCell = document.createElement('td');
+                        let deleteButton = document.createElement('button');
+                        deleteButton.innerText = 'X';
+                        deleteButton.onclick = () => deleteComment(data.data.id, comment.id);
+                        deleteCell.appendChild(deleteButton);
+                        row.appendChild(deleteCell);
+
+                        commentTable.appendChild(row);
+                    });
+                });
+        }
+
+        function deletePost(memberId, postId) {
+            fetch(`/api/members/${memberId}/posts/${postId}`, {
+                method: 'DELETE'
+            })
+                .then(() => {
+                    fetchMyInfo();
+                });
+        }
+
+        function deleteComment(memberId, commentId) {
+            fetch(`/api/members/${memberId}/comments/${commentId}`, {
+                method: 'DELETE'
+            })
+                .then(() => {
+                    fetchMyInfo();
+                });
+        }
+
+        window.onload = () => {
+            fetchMyInfo();
+        };
+    </script>
+</head>
+<body>
+<h1>My Room</h1>
+<div id="user-info"></div>
+<h2>My Posts</h2>
+<table id="post-table"></table>
+<h2>My Comments</h2>
+<table id="comment-table"></table>
+</body>
+</html>

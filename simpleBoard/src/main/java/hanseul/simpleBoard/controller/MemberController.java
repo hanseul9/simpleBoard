@@ -10,6 +10,7 @@ import hanseul.simpleBoard.responsedto.BasicResponse;
 import hanseul.simpleBoard.responsedto.comment.CommentGetResponseDto;
 import hanseul.simpleBoard.responsedto.member.MemberGetResponseDto;
 import hanseul.simpleBoard.responsedto.member.MemberJoinResponse;
+import hanseul.simpleBoard.responsedto.member.MemberWithPostAndCommentResponseDto;
 import hanseul.simpleBoard.responsedto.post.PostListDto;
 import hanseul.simpleBoard.service.CommentService;
 import hanseul.simpleBoard.service.MemberService;
@@ -54,10 +55,10 @@ public class MemberController {
     }
 
     @GetMapping("/members/{memberId}") //회원 단건 조회
-    public ResponseEntity<BasicResponse<MemberGetResponseDto>> getMemberById(@PathVariable("memberId") Long memberId) {
+    public ResponseEntity<BasicResponse> getMemberById(@PathVariable("memberId") Long memberId) {
         Member member = memberService.findOne(memberId);
-        MemberGetResponseDto getMemberResponseDto = new MemberGetResponseDto(member);
-        BasicResponse<MemberGetResponseDto> basicResponse = new BasicResponse<>("회원 조회 성공", getMemberResponseDto);
+        MemberWithPostAndCommentResponseDto getMemberResponseDto = new MemberWithPostAndCommentResponseDto(member);
+        BasicResponse basicResponse = new BasicResponse<>("회원 조회 성공", getMemberResponseDto);
         return new ResponseEntity<>(basicResponse, HttpStatus.OK);
     }
 
@@ -93,7 +94,7 @@ public class MemberController {
 
 
 
-    @PostMapping("/logout") //로그아웃
+    @PostMapping("/members/logout") //로그아웃
     public ResponseEntity<BasicResponse> logout(HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = customSecurityUtil.getAuthentication();
         if (authentication != null) {
@@ -102,8 +103,6 @@ public class MemberController {
         BasicResponse basicResponse = new BasicResponse<>("로그아웃 성공", null);
         return ResponseEntity.ok(basicResponse);
     }
-
-
 
 
     @GetMapping("/members/{memberId}/posts") // 특정 회원의 게시글 목록 조회
@@ -126,6 +125,14 @@ public class MemberController {
                 .map(CommentGetResponseDto::new);
 
         return new ResponseEntity<>(commentList, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/members/{memberId}/posts/{postId}") // 특정 회원의 댓글 삭제
+    @PreAuthorize("@customSecurityUtil.isMemberOwner(#memberId) and @customSecurityUtil.isPostOwner(#postId)")
+    public ResponseEntity<BasicResponse> deleteMembersPosts(@PathVariable Long memberId, @PathVariable Long postId) {
+        postService.deletePost(postId);
+        BasicResponse memberBasicResponse = new BasicResponse("게시글 삭제 완료", null);
+        return new ResponseEntity<>(memberBasicResponse, HttpStatus.OK);
     }
 
     @DeleteMapping("/members/{memberId}/comments/{commentId}") // 특정 회원의 댓글 삭제

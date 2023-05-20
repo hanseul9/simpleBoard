@@ -30,7 +30,7 @@ public class Comment {
 
     public Comment(Post post, Member member, String content) {
         this.post = post;
-        this.member = post.getMember();
+        this.member = member;
         this.commentedAt = LocalDateTime.now();
         this.content = content;
 

@@ -45,16 +45,30 @@
 
                     let pagination = document.getElementById('pagination');
                     pagination.innerHTML = '';
-                    for (let i = 0; i < data.totalPages; i++) {
+                    for (let i = 0; i < data.total_pages; i++) {   // 수정된 부분
                         let button = document.createElement('button');
                         button.innerText = i + 1;
-                        button.onclick = () => fetchPosts(i);
+                        button.onclick = () => {
+                            fetchPosts(i);
+                            window.localStorage.setItem('currentPage', i);
+                        };
+                        if(i === data.current_page) { // 수정된 부분
+                            button.style.backgroundColor = "#aaa"; // Change color of button
+                        }
                         pagination.appendChild(button);
                     }
+
+
                 });
         }
 
         window.onload = () => {
+            let savedPage = window.localStorage.getItem('currentPage');
+            if(savedPage !== null) {
+                fetchPosts(parseInt(savedPage)); // localStorage에서 가져온 값을 정수로 변환
+            } else {
+                fetchPosts();
+            }
             fetchPosts();
             fetch('/api/members')
                 .then(response => response.json())
@@ -93,7 +107,7 @@
     <p id="current-user"></p>
     <button onclick="logout()">로그아웃</button>
     <button onclick="goToPosting()">새 글 쓰기</button>
-    <button onclick="goToPosting()">마이룸</button>
+    <button onclick="goToMyRoom()">마이룸</button>
 </div>
 <div>
     <table id="posts-table">

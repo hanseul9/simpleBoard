@@ -3,6 +3,7 @@ package hanseul.simpleBoard.config.auth;
 import hanseul.simpleBoard.domain.Comment;
 import hanseul.simpleBoard.domain.Member;
 import hanseul.simpleBoard.domain.Post;
+import hanseul.simpleBoard.repository.MemberRepository;
 import hanseul.simpleBoard.service.CommentService;
 import hanseul.simpleBoard.service.MemberService;
 import hanseul.simpleBoard.service.PostService;
@@ -11,6 +12,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -24,6 +27,7 @@ public class CustomSecurityUtil{
      */
 
     private final MemberService memberService;
+    private final MemberRepository memberRepository;
     private final PostService postService;
     private final CommentService commentService;
 
@@ -35,9 +39,21 @@ public class CustomSecurityUtil{
 
     public Long getMemberId() {
         Authentication authentication = getAuthentication();
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        return userDetails.getId();
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof CustomUserDetails) {
+            return ((CustomUserDetails) principal).getId();
+        } else if (principal instanceof DefaultOAuth2User) {
+            // 소셜 로그인을 통해 반환된 사용자 정보를 바탕으로 회원 ID를 조회
+            String email = (String) ((DefaultOAuth2User) principal).getAttributes().get("email");
+            Member member = memberRepository.findByEmail(email).orElseThrow(() ->
+                    new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+            return member.getId();
+        } else {
+            throw new IllegalArgumentException("알 수 없는 사용자 타입입니다.");
+        }
     }
+
 
     public boolean isMemberOwner(Long memberId) { //memberId를 가지고 본인소유인지 파악
 

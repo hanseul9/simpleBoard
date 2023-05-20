@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,6 +29,15 @@ public class SecurityConfig{
         return new BCryptPasswordEncoder();
     }
 
+    private final GoogleOauth2UserService googleOauth2UserService;
+
+    protected void configure(HttpSecurity http) throws Exception { //세션관리
+        http
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .invalidSessionUrl("/")
+                .maximumSessions(1);
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -48,10 +58,22 @@ public class SecurityConfig{
                         .permitAll()  // 로그인 페이지 이동이 막히면 안되므로 관련된애들 모두 허용
 
                 )
+
+                .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/oauth2/authorization/google")
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(googleOauth2UserService)
+                        )
+                        .defaultSuccessUrl("/posts", true) //성공시
+                        .permitAll()
+                )
+
+
+
                 .logout(withDefaults())  // 로그아웃은 기본설정으로 (/logout으로 인증해제)
                 //.logout((logout) -> logout.permitAll());
 
-                .httpBasic()//postman 사용시 필요
+                //.httpBasic()//postman 사용시 필요
                 ;
 
 

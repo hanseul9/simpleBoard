@@ -1,10 +1,29 @@
-<!--게시글 조회-->
-
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>Post Detail</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+  <style>
+    .comment-item {margin-bottom: 15px;}
+    .comment-content {font-size: 0.9rem;}
+    .comment-info {font-size: 0.8rem; color: gray;}
+    .comment-buttons {font-size: 0.7rem;}
+
+    /* 글자 크기 조정 */
+    h4, label {
+      font-size: 0.9rem;
+    }
+    h2{
+      font-size : 1.2rem;
+    }
+    p.lead, .comment-item {
+      font-size: 0.8rem;
+    }
+
+  </style>
+
   <script>
     window.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -13,9 +32,7 @@
       fetch(`/api/posts/${postId}`)
               .then(response => response.json())
               .then(data => {
-                console.log(data);
                 const post = data.data;
-                console.log(post.owner);
 
                 document.getElementById('post-title').innerText = '제목: ' + post.title;
                 document.getElementById('post-content').innerText = '내용: ' + post.content;
@@ -29,10 +46,95 @@
                   document.getElementById('edit-button').style.display = 'none';
                   document.getElementById('delete-button').style.display = 'none';
                 }
+
+                // 댓글 리스트
+                const commentList = document.getElementById('comment-list');
+                post.commentList.forEach(comment => {
+                  const commentCard = document.createElement('div');
+                  commentCard.className = 'card comment-item';
+
+                  const commentBody = document.createElement('div');
+                  commentBody.className = 'card-body';
+
+                  const commentContent = document.createElement('p');
+                  commentContent.className = 'card-text comment-content';
+                  commentContent.innerText = comment.content;
+                  commentBody.appendChild(commentContent);
+
+                  const commentInfo = document.createElement('p');
+                  commentInfo.className = 'card-text comment-info';
+                  commentInfo.innerText = `작성자: ${comment.writerName}, 작성시간: ${new Date(comment.commentedAt).toLocaleString()}`;
+                  commentBody.appendChild(commentInfo);
+
+                  // 댓글 수정 삭제 버튼
+                  if (comment.owner) {
+                    const commentButtons = document.createElement('div');
+                    commentButtons.className = 'comment-buttons';
+
+                    // 댓글 수정 버튼
+                    const editButton = document.createElement('button');
+                    editButton.className = 'btn btn-sm btn-primary mr-3';
+                    editButton.innerText = '댓글 수정';
+                    editButton.onclick = () => {
+                      const newContent = prompt('새 댓글 내용을 입력하세요', comment.content);
+                      fetch(`/api/posts/${postId}/comments/${comment.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                          'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                          content: newContent
+                        })
+                      })
+                              .then(() => {
+                                window.location.reload();
+                              });
+                    };
+                    commentButtons.appendChild(editButton);
+
+                    // 댓글 삭제 버튼
+                    const deleteButton = document.createElement('button');
+                    deleteButton.className = 'btn btn-sm btn-danger'; // or mr-3, mr-4
+                    deleteButton.innerText = '댓글 삭제';
+                    deleteButton.onclick = () => {
+                      fetch(`/api/posts/${postId}/comments/${comment.id}`, { method: 'DELETE' })
+                              .then(() => {
+                                window.location.reload();
+                              });
+                    };
+                    commentButtons.appendChild(deleteButton);
+
+                    commentBody.appendChild(commentButtons);
+                  }
+
+                  commentCard.appendChild(commentBody);
+                  commentList.appendChild(commentCard);
+                });
+
               })
               .catch(error => {
                 console.error('게시글 정보를 가져오는 중 오류가 발생했습니다.', error);
               });
+
+      // 댓글 등록 이벤트
+      document.getElementById('add-comment-form').onsubmit = function(event) {
+        event.preventDefault();
+
+        const content = document.getElementById('new-comment-content').value;
+
+        fetch(`/api/posts/${postId}/comments`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            content: content
+          })
+        })
+                .then(() => {
+                  window.location.reload();
+                });
+      };
 
       document.getElementById('delete-button').onclick = function() {
         fetch(`/api/posts/${postId}`, { method: 'DELETE' })
@@ -55,20 +157,40 @@
       document.getElementById('edit-button').onclick = function() {
         window.location.href = `/posting?postId=${postId}`;
       };
-
     });
   </script>
 </head>
-<body>
-<h1 id="post-title"></h1>
-<p id="post-content"></p>
-<p id="post-writer"></p>
-<p id="post-postedAt"></p>
+<body class="container">
+<div class="card my-4">
+  <div class="card-header">
+    <h2 class="m-0" id="post-title"></h2>
+  </div>
+  <div class="card-body">
+    <p class="lead" id="post-content"></p>
+    <p class="text-muted small" id="post-writer"></p>
+    <p class="text-muted small" id="post-postedAt"></p>
+  </div>
+  <div class="card-footer">
+    <!-- 수정 버튼 -->
+    <button id="edit-button" class="btn btn-sm btn-primary" style="display: none;">글 수정</button>
 
-<!-- 수정 버튼 -->
-<button id="edit-button" style="display: none;">글 수정</button>
+    <!-- 삭제 버튼 -->
+    <button id="delete-button" class="btn btn-sm btn-danger ml-2" style="display: none;">글 삭제</button>
+  </div>
+</div>
 
-<!-- 삭제 버튼 -->
-<button id="delete-button" style="display: none;">글 삭제</button>
+<!-- 댓글 리스트 -->
+<h4>댓글 목록</h4>
+<div id="comment-list"></div>
+
+<!-- 댓글 작성 폼 -->
+<form id="add-comment-form" class="form-group">
+  <label for="new-comment-content">댓글 내용</label>
+  <input id="new-comment-content" type="text" class="form-control" required>
+  <button type="submit" class="btn btn-sm btn-success my-2">댓글 등록</button>
+</form>
+
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>

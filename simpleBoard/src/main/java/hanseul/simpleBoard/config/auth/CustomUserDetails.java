@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @RequiredArgsConstructor
@@ -28,6 +30,13 @@ public class CustomUserDetails implements UserDetails {
         this.name = name;
         this.enabled = true;
         this.authorities = Collections.singletonList(new SimpleGrantedAuthority("USER"));
+    }
+    public Map<String, Object> toAttributes() {
+        Map<String, Object> attributes = new HashMap<>();
+        attributes.put("id", id);
+        attributes.put("email", email);
+        attributes.put("name", name);
+        return attributes;
     }
 
     @Override

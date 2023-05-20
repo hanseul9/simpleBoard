@@ -16,8 +16,8 @@
     <input type="password" id="password" name="password"/>
   </div>
   <div>
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username"/>
+    <label for="name">Username:</label>
+    <input type="text" id="name" name="name"/>
   </div>
   <div>
     <button type="submit">Submit</button>
@@ -31,21 +31,43 @@
     var formData = {
       email: document.getElementById("email").value,
       password: document.getElementById("password").value,
-      username: document.getElementById("username").value
+      name: document.getElementById("name").value
     };
 
     var xhr = new XMLHttpRequest();
-    xhr.open("POST", "/members");
+    xhr.open("POST", "/api/members");
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 
     xhr.onreadystatechange = function() {
       if (xhr.readyState === 4) {
-        console.log("AJAX request completed with status:", xhr.status);
-        console.log("AJAX request response:", xhr.responseText);
+
+        const response = JSON.parse(xhr.responseText);
+        var message = response.message;
 
         // Check if the status is 201 (Created) and redirect to the login page
         if (xhr.status === 201) {
-          window.location.href = "/login";
+          alert(message);
+          location.href = "/login";
+        }
+        else {
+          const msg1 = response.message;
+          const msg2 = response.email;
+          const msg3 = response.password;
+          const msg4 = response.name;
+          message = ""
+          if (msg1 !== undefined) {
+            message += msg1 + "\n";
+          }
+          if (msg2 !== undefined) {
+            message += msg2 + "\n";
+          }
+          if (msg3 !== undefined) {
+            message += msg3+ "\n";
+          }
+          if (msg4 !== undefined) {
+            message += msg4+ "\n";
+          }
+          alert(message);
         }
       }
     };

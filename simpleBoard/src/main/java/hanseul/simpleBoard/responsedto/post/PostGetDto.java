@@ -2,6 +2,7 @@ package hanseul.simpleBoard.responsedto.post;
 
 import hanseul.simpleBoard.domain.Post;
 import hanseul.simpleBoard.responsedto.comment.CommentGetResponseDto;
+import hanseul.simpleBoard.responsedto.comment.CommentInPostResponseDto;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -12,7 +13,7 @@ import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
-public class PostGetDto {
+public class PostGetDto {   // 단건 조회시 사용
     private Long id;
     private String title;
     private String content;
@@ -20,7 +21,7 @@ public class PostGetDto {
     private String writerName;
     private boolean owner = false;
 
-    private List<CommentGetResponseDto> commentList = new ArrayList<>();
+    private List<CommentInPostResponseDto > commentList = new ArrayList<>();
 
     public PostGetDto(Post post, Long memberId) {
         id = post.getId();
@@ -31,9 +32,8 @@ public class PostGetDto {
         owner  = post.getMember().getId().equals(memberId);
 
         this.commentList = post.getCommentList().stream()
-                .map(comment -> new CommentGetResponseDto(comment))
+                .map(comment -> new CommentInPostResponseDto(comment, memberId))
                 .collect(Collectors.toList());
-
 
     }
 }

@@ -33,12 +33,6 @@ public class MyMemberDetailService implements UserDetailsService {
                 member.getName()
         );
 
-//        return User.builder()
-//                .username(member.getEmail())
-//                .password(member.getPassword())
-//                .roles("USER")
-//                .build();
     }
-
 
 }

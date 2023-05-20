@@ -51,10 +51,12 @@ public class MemberService {
         Member member = findOne(memberId);
 
         if (!passwordEncoder.matches(memberUpdateDto.getOldPassword(), member.getPassword())) {
-            throw new MemberPasswordIncorrectException();
+            throw new MemberPasswordIncorrectException(); //비밀번호 검사
         }
 
         String email = memberUpdateDto.getEmail();
+        existsByEmail(email);
+
         String password = passwordEncoder.encode(memberUpdateDto.getNewPassword());
         String name = memberUpdateDto.getName();
 

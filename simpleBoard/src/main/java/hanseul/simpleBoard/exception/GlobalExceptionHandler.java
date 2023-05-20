@@ -66,6 +66,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DuplicateEmailException.class) //이메일 중복 예외
     public ResponseEntity<ErrorBasicResponse>  handleDuplicateEmailException( DuplicateEmailException ex) {
         ErrorBasicResponse errorResponse = new ErrorBasicResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 }

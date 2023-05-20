@@ -46,5 +46,9 @@ public class WebController {
         return "posting";
     }
 
+    @GetMapping("/myRoom") // 마이룸
+    public String myRoom() {
+        return "myRoom";
+    }
 
 }
