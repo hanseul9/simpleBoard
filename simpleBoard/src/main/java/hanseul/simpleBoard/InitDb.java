@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Profile;
 import hanseul.simpleBoard.requestdto.comment.CommentCreateRequestDto;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Component
@@ -31,7 +32,8 @@ public class InitDb implements CommandLineRunner {
         loadData();
     }
 
-    private void loadData() {
+    @Transactional
+    void loadData() {
         // Create sample members
         String encodedPassword = passwordEncoder.encode("password4");
         Member member1 = new Member("member1", "test1@naver.com", encodedPassword);

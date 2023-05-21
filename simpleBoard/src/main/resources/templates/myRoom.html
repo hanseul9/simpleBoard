@@ -1,20 +1,32 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>My Room</title>
     <script>
+
+        let memberId;
         function fetchMyInfo() {
             fetch('/api/members')
                 .then(response => response.json())
                 .then(data => {
+                    memberId = data.data.id;
                     let userInfo = document.getElementById('user-info');
                     userInfo.innerHTML = `
-                        <p>ID: ${data.data.id}</p>
+                        <p>ID: ${memberId}</p>
                         <p>Name: ${data.data.name}</p>
                         <p>Email: ${data.data.email}</p>
                     `;
 
+                    fetchMyPosts();
+                    fetchMyComments();
+                });
+        }
+
+        function fetchMyPosts(page = 0) {
+            fetch(`/api/members/${memberId}/posts?page=${page}`)
+                .then(response => response.json())
+                .then(data => {
                     let postTable = document.getElementById('post-table');
                     postTable.innerHTML = `
                         <tr>
@@ -26,7 +38,7 @@
                             <th>Delete</th>
                         </tr>
                     `;
-                    data.data.postList.forEach(post => {
+                    data.content.forEach(post => {
                         let row = document.createElement('tr');
 
                         let idCell = document.createElement('td');
@@ -35,6 +47,8 @@
 
                         let titleCell = document.createElement('td');
                         titleCell.innerText = post.title;
+                        titleCell.style.cursor = "pointer";
+                        titleCell.onclick = () => showPostDetail(post.id);
                         row.appendChild(titleCell);
 
                         let contentCell = document.createElement('td');
@@ -59,6 +73,27 @@
                         postTable.appendChild(row);
                     });
 
+                    let pagination = document.getElementById('posts-pagination');
+                    pagination.innerHTML = '';
+                    for (let i = 0; i < data.total_pages; i++) {
+                        let button = document.createElement('button');
+                        button.innerText = i + 1;
+                        button.onclick = () => {
+                            fetchMyPosts(i);
+                            window.localStorage.setItem('currentPostsPage', i);
+                        };
+                        if(i === data.current_page) {
+                            button.style.backgroundColor = "#aaa";
+                        }
+                        pagination.appendChild(button);
+                    }
+                });
+        }
+
+        function fetchMyComments(page = 0) {
+            fetch(`/api/members/${memberId}/comments?page=${page}`)
+                .then(response => response.json())
+                .then(data => {
                     let commentTable = document.getElementById('comment-table');
                     commentTable.innerHTML = `
                         <tr>
@@ -69,7 +104,7 @@
                             <th>Delete</th>
                         </tr>
                     `;
-                    data.data.commentList.forEach(comment => {
+                    data.content.forEach(comment => {
                         let row = document.createElement('tr');
 
                         let idCell = document.createElement('td');
@@ -97,10 +132,25 @@
 
                         commentTable.appendChild(row);
                     });
+
+                    let pagination = document.getElementById('comments-pagination');
+                    pagination.innerHTML = '';
+                    for (let i = 0; i < data.total_pages; i++) {
+                        let button = document.createElement('button');
+                        button.innerText = i + 1;
+                        button.onclick = () => {
+                            fetchMyComments(i);
+                            window.localStorage.setItem('currentCommentsPage', i);
+                        };
+                        if(i === data.current_page) {
+                            button.style.backgroundColor = "#aaa";
+                        }
+                        pagination.appendChild(button);
+                    }
                 });
         }
 
-        function deletePost(memberId, postId) {
+        function deletePost(postId) {
             fetch(`/api/members/${memberId}/posts/${postId}`, {
                 method: 'DELETE'
             })
@@ -109,7 +159,7 @@
                 });
         }
 
-        function deleteComment(memberId, commentId) {
+        function deleteComment(commentId) {
             fetch(`/api/members/${memberId}/comments/${commentId}`, {
                 method: 'DELETE'
             })
@@ -118,8 +168,24 @@
                 });
         }
 
+        function showPostDetail(postId) {
+            window.location.href = `/postDetail?postId=${postId}`;
+        }
+
         window.onload = () => {
             fetchMyInfo();
+            let savedPostsPage = window.localStorage.getItem('currentPostsPage');
+            if(savedPostsPage !== null) {
+                fetchMyPosts(parseInt(savedPostsPage));
+            } else {
+                fetchMyPosts();
+            }
+            let savedCommentsPage = window.localStorage.getItem('currentCommentsPage');
+            if(savedCommentsPage !== null) {
+                fetchMyComments(parseInt(savedCommentsPage));
+            } else {
+                fetchMyComments();
+            }
         };
     </script>
 </head>
@@ -128,7 +194,9 @@
 <div id="user-info"></div>
 <h2>My Posts</h2>
 <table id="post-table"></table>
+<nav id="posts-pagination"></nav>
 <h2>My Comments</h2>
 <table id="comment-table"></table>
+<nav id="comments-pagination"></nav>
 </body>
 </html>

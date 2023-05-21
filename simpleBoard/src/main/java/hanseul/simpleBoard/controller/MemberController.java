@@ -31,7 +31,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -105,26 +107,51 @@ public class MemberController {
     }
 
 
+//    @GetMapping("/members/{memberId}/posts") // 특정 회원의 게시글 목록 조회
+//    @PreAuthorize("@customSecurityUtil.isMemberOwner(#memberId)")
+//    public ResponseEntity<Page<PostListDto>> getMembersPosts(@PathVariable Long memberId,
+//                                                             @RequestParam(value = "page", defaultValue = "0") int page) {
+//        Pageable pageable = PageRequest.of(page, 10);
+//        Page<PostListDto> postList = postService.findByMemberIdOrderByPostedAtDescIdAsc(pageable, memberId)
+//                .map(PostListDto::new);
+//
+//
+//        return new ResponseEntity<>(postList, HttpStatus.OK);
+//    }
+
     @GetMapping("/members/{memberId}/posts") // 특정 회원의 게시글 목록 조회
     @PreAuthorize("@customSecurityUtil.isMemberOwner(#memberId)")
-    public ResponseEntity<Page<PostListDto>> getMembersPosts(@PathVariable Long memberId,
-                                                             @RequestParam(value = "page", defaultValue = "0") int page) {
+    public ResponseEntity<Map<String, Object>> getMembersPosts(@PathVariable Long memberId,
+                                                               @RequestParam(value = "page", defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 10);
         Page<PostListDto> postList = postService.findByMemberIdOrderByPostedAtDescIdAsc(pageable, memberId)
                 .map(PostListDto::new);
-        return new ResponseEntity<>(postList, HttpStatus.OK);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("current_page", postList.getNumber());
+        response.put("total_pages", postList.getTotalPages());
+        response.put("total_elements", postList.getTotalElements());
+        response.put("content", postList.getContent());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @GetMapping("/members/{memberId}/comments") // 특정 회원의 댓글 목록 조회
     @PreAuthorize("@customSecurityUtil.isMemberOwner(#memberId)")
-    public ResponseEntity<Page<CommentGetResponseDto>> getMembersComments(@PathVariable Long memberId,
+    public ResponseEntity<Map<String, Object>> getMembersComments(@PathVariable Long memberId,
                                                                           @RequestParam(value = "page", defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 10);
 
         Page<CommentGetResponseDto> commentList = commentService.findByMemberIdOrderByCommentedAtDescIdAsc(pageable, memberId)
                 .map(CommentGetResponseDto::new);
 
-        return new ResponseEntity<>(commentList, HttpStatus.OK);
+        Map<String, Object> response = new HashMap<>();
+        response.put("current_page", commentList.getNumber());
+        response.put("total_pages", commentList.getTotalPages());
+        response.put("total_elements", commentList.getTotalElements());
+        response.put("content", commentList.getContent());
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/members/{memberId}/posts/{postId}") // 특정 회원의 댓글 삭제
