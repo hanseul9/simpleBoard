@@ -27,7 +27,7 @@ public class InitDB {
 
 
     @PostConstruct
-    public void postConstruct() {
+    public static void postConstruct() {
         dataInit();
     }
 
