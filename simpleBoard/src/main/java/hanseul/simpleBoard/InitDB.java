@@ -27,6 +27,7 @@ public class InitDB {
 
 
     @Transactional
+    @PostConstruct
     public void dataInit() {
         String encodedPassword = passwordEncoder.encode("password4");
         Member member1 = new Member("member1", "test1@naver.com", encodedPassword);
