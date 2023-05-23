@@ -26,11 +26,6 @@ public class InitDB {
     final private PasswordEncoder passwordEncoder;
 
 
-    @PostConstruct
-    public static void postConstruct() {
-        dataInit();
-    }
-
     @Transactional
     public void dataInit() {
         String encodedPassword = passwordEncoder.encode("password4");
