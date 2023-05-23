@@ -14,12 +14,14 @@ import java.util.stream.Collectors;
 public class PostListDto {
     private Long id;
     private String title;
+    private String content;
     private LocalDateTime postedAt;
     private String writerName;
 
     public PostListDto (Post post) {
         id = post.getId();
         title = post.getTitle();
+        content = post.getContent();
         postedAt = post.getPostedAt();
         writerName = post.getMember().getName();
     }

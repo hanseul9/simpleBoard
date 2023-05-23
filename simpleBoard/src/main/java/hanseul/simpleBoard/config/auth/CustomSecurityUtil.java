@@ -61,13 +61,20 @@ public class CustomSecurityUtil{
 
         Authentication authentication = getAuthentication();
 
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
+
+        if (authentication.getPrincipal() instanceof UserDetails) {
 
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
             Long currentUserId = userDetails.getId();
             return currentUserId.equals(memberId); // 현재 사용자의 ID와 요청한 ID가 일치하는지 확인
         }
+        else if(authentication.getPrincipal() instanceof DefaultOAuth2User oathUserDetails){
+            String email = oathUserDetails.getAttribute("email");
+            Member byEmail = memberService.findByEmail(email);
+            return byEmail.getId().equals(memberId); // 현재 사용자의 ID와 요청한 ID가 일치하는지 확인
+        }
+
         return false; // 인증 정보가 없는 경우 false 반환
     }
 

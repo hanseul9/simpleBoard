@@ -1,11 +1,38 @@
-<!--글 목록 View-->
-
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Simple Board</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        #posts-table th:first-child {
+            width: 5%;
+        }
+    </style>
+
+
+
     <script>
+        let currentPostsPage = 0;
+        const MAX_ROWS = 11;
+
+        function addEmptyRows(table, count) {
+            for (let i = 0; i < count; i++) {
+                let row = document.createElement('tr');
+                row.style.height = '48px';  // 이 값을 변경하여 원하는 높이를 설정
+                for (let j = 0; j < 4; j++) {
+                    let cell = document.createElement('td');
+                    cell.style.height = '48px';  // td 요소의 높이를 고정
+                    cell.style.overflow = 'auto';  // 내용이 너무 많으면 스크롤을 생성
+                    let filler = document.createElement('div');
+                    filler.style.height = '100%';  // div 요소의 높이를 td 요소의 높이에 맞춤
+                    cell.appendChild(filler);
+                    row.appendChild(cell);
+                }
+                table.appendChild(row);
+            }
+        }
+
         function fetchPosts(page = 0) {
             fetch(`/api/posts?page=${page}`)
                 .then(response => response.json())
@@ -13,28 +40,26 @@
                     let postsTable = document.getElementById('posts-table');
                     postsTable.innerHTML = `
                         <tr>
-                            <th>ID</th>
-                            <th>제목</th>
-                            <th>글쓴이</th>
+                            <th id="posts-table">ID</th>
+                            <th>Title</th>
+                            <th>Writer Name</th>
                             <th>Posted At</th>
                         </tr>`;
                     data.content.forEach(post => {
                         let row = document.createElement('tr');
-
                         let idCell = document.createElement('td');
                         idCell.innerText = post.id;
                         row.appendChild(idCell);
 
                         let titleCell = document.createElement('td');
                         titleCell.innerText = post.title;
-                        // 클릭시 게시글로 이동
-                        titleCell.style.cursor = "pointer"; // Change cursor style when hovering
-                        titleCell.onclick = () => showPostDetail(post.id);
+                        titleCell.style.cursor = "pointer";
+                        titleCell.onclick = () => window.location.href = `/postDetail?postId=${post.id}`;
                         row.appendChild(titleCell);
 
-                        let authorCell = document.createElement('td');
-                        authorCell.innerText = post.writerName;
-                        row.appendChild(authorCell);
+                        let writerCell = document.createElement('td');
+                        writerCell.innerText = post.writerName;
+                        row.appendChild(writerCell);
 
                         let postedAtCell = document.createElement('td');
                         postedAtCell.innerText = new Date(post.postedAt).toLocaleString();
@@ -43,33 +68,90 @@
                         postsTable.appendChild(row);
                     });
 
-                    let pagination = document.getElementById('pagination');
+                    let pagination = document.getElementById('posts-pagination');
                     pagination.innerHTML = '';
-                    for (let i = 0; i < data.total_pages; i++) {   // 수정된 부분
+
+                    let groupSize = 10;
+                    let currentGroup = Math.floor(page / groupSize);
+
+// Previous button
+                    let prevButton = document.createElement('button');
+                    prevButton.innerText = 'Prev';
+                    prevButton.classList.add("btn", "btn-primary", "mr-2");
+                    prevButton.onclick = () => {
+                        if (currentGroup > 0) {
+                            currentGroup--;
+                            let newPage = currentGroup * groupSize;
+                            fetchPosts(newPage);
+                            window.localStorage.setItem('currentPage', newPage);
+                            window.history.pushState({type: 'post', page: newPage}, `Page ${newPage}`, `?page=${newPage}`);
+                        }
+                    };
+                    pagination.appendChild(prevButton);
+
+// Generate buttons for each page in the current group
+                    for (let i = currentGroup * groupSize; i < Math.min((currentGroup + 1) * groupSize, data.total_pages); i++) {
                         let button = document.createElement('button');
                         button.innerText = i + 1;
+                        button.classList.add("btn", "btn-primary", "mr-2");
+                        if(i === page) {
+                            button.classList.add("btn-secondary");
+                        }
                         button.onclick = () => {
                             fetchPosts(i);
                             window.localStorage.setItem('currentPage', i);
+                            window.history.pushState({type: 'post', page: i}, `Page ${i}`, `?page=${i}`);
                         };
-                        if(i === data.current_page) { // 수정된 부분
-                            button.style.backgroundColor = "#aaa"; // Change color of button
-                        }
                         pagination.appendChild(button);
                     }
 
+// Next button
+                    let nextButton = document.createElement('button');
+                    nextButton.innerText = 'Next';
+                    nextButton.classList.add("btn", "btn-primary", "mr-2");
+                    nextButton.onclick = () => {
+                        if (currentGroup < Math.floor((data.total_pages - 1) / groupSize)) {
+                            currentGroup++;
+                            let newPage = currentGroup * groupSize;
+                            fetchPosts(newPage);
+                            window.localStorage.setItem('currentPage', newPage);
+                            window.history.pushState({type: 'post', page: newPage}, `Page ${newPage}`, `?page=${newPage}`);
+                        }
+                    };
+                    pagination.appendChild(nextButton);
 
+
+                    addEmptyRows(postsTable, MAX_ROWS - data.content.length);
+                });
+        }
+        function fetchMyInfo() {
+            fetch('/api/members')
+                .then(response => response.json())
+                .then(data => {
+                    let userInfo = document.getElementById('user-info');
+                    userInfo.innerHTML = `
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h6 class="card-title">${data.data.name}</h6>
+                                <h7 class="card-subtitle mb-2 text-muted">${data.data.email}</h7>
+                                <p class="card-text">ID: ${data.data.id}</p>
+                            </div>
+                        </div>
+                    `;
+                    currentPostsPage = parseInt(window.localStorage.getItem('currentPostsPage')) || 0;
                 });
         }
 
         window.onload = () => {
-            let savedPage = window.localStorage.getItem('currentPage');
-            if(savedPage !== null) {
-                fetchPosts(parseInt(savedPage)); // localStorage에서 가져온 값을 정수로 변환
-            } else {
-                fetchPosts();
-            }
-            fetchPosts();
+            localStorage.removeItem('currentPage');
+            fetchMyInfo();
+            fetchPosts();  // 게시글을 로딩합니다.
+            window.onpopstate = function(event) {
+                if(event.state.type === 'post') {
+                    fetchPosts(event.state.page);
+                }
+            };
+
             fetch('/api/members')
                 .then(response => response.json())
                 .then(data => {
@@ -79,12 +161,7 @@
         };
 
         function logout() {
-            fetch('/api/logout', {
-                method: 'POST'
-            })
-                .then(() => {
-                    window.location.href = '/login';
-                });
+            window.location.href = '/logout';
         }
 
         function goToPosting() {
@@ -94,28 +171,25 @@
             window.location.href = '/myRoom';
         }
 
-        function showPostDetail(postId) {
-            window.location.href = `/postDetail?postId=${postId}`;
-        }
-
-
     </script>
 </head>
 <body>
-<h1>Posts</h1>
-<div>
-    <p id="current-user"></p>
-    <button onclick="logout()">로그아웃</button>
-    <button onclick="goToPosting()">새 글 쓰기</button>
-    <button onclick="goToMyRoom()">마이룸</button>
+<div class="container-fluid mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1>Posts</h1>
+            <div id="user-info" class="my-3"></div>
+            <button onclick="logout()" class="btn btn-primary" style="margin-bottom: 10px">로그아웃</button>
+            <button onclick="goToPosting()" class="btn btn-primary" style="margin-bottom: 10px">새 글 쓰기</button>
+            <button onclick="goToMyRoom()" class="btn btn-primary" style="margin-bottom: 10px">마이룸</button>
+            <table id="posts-table" class="table mb-0" ></table>
+            <nav id="posts-pagination" class="mt-0 mb-4 d-flex justify-content-center"></nav>
+
+        </div>
+    </div>
 </div>
-<div>
-    <table id="posts-table">
-    </table>
-</div>
-<div>
-    <nav id="pagination">
-    </nav>
-</div>
+
+
+
 </body>
 </html>

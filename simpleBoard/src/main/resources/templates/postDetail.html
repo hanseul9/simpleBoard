@@ -1,15 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>Post Detail</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
   <style>
-    .comment-item {margin-bottom: 15px;}
-    .comment-content {font-size: 0.9rem;}
-    .comment-info {font-size: 0.8rem; color: gray;}
-    .comment-buttons {font-size: 0.7rem;}
 
     /* 글자 크기 조정 */
     h4, label {
@@ -17,9 +12,6 @@
     }
     h2{
       font-size : 1.2rem;
-    }
-    p.lead, .comment-item {
-      font-size: 0.8rem;
     }
 
   </style>
@@ -158,9 +150,16 @@
         window.location.href = `/posting?postId=${postId}`;
       };
     });
+
+    function goToPostList() {
+      window.location.href = '/posts';
+    }
+
+
   </script>
 </head>
 <body class="container">
+<button onclick="goToPostList()" class="btn btn-primary" style="margin-top: 20px">Go to Post List</button>
 <div class="card my-4">
   <div class="card-header">
     <h2 class="m-0" id="post-title"></h2>

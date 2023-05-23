@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<html>
 <head>
-    <meta charset="UTF-8">
-    <title>My Room</title>
-    <script>
+        <title>My Room</title>
 
+
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script>
         let memberId;
+        let currentPostsPage = 0;
+        let currentCommentsPage = 0;
+        const MAX_ROWS = 11;
+
         function fetchMyInfo() {
             fetch('/api/members')
                 .then(response => response.json())
@@ -13,15 +17,39 @@
                     memberId = data.data.id;
                     let userInfo = document.getElementById('user-info');
                     userInfo.innerHTML = `
-                        <p>ID: ${memberId}</p>
-                        <p>Name: ${data.data.name}</p>
-                        <p>Email: ${data.data.email}</p>
+                        <div class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h6 class="card-title">${data.data.name}</h6>
+                                <h7 class="card-subtitle mb-2 text-muted">${data.data.email}</h7>
+                                <p class="card-text">ID: ${memberId}</p>
+                            </div>
+                        </div>
                     `;
-
-                    fetchMyPosts();
-                    fetchMyComments();
+                    currentPostsPage = parseInt(window.localStorage.getItem('currentPostsPage')) || 0;
+                    currentCommentsPage = parseInt(window.localStorage.getItem('currentCommentsPage')) || 0;
+                    fetchMyPosts(currentPostsPage);
+                    fetchMyComments(currentCommentsPage);
                 });
         }
+
+        function addEmptyRows(table, count) {
+            for (let i = 0; i < count; i++) {
+                let row = document.createElement('tr');
+                row.style.height = '55px';  // 이 값을 변경하여 원하는 높이를 설정
+                for (let j = 0; j < 6; j++) {
+                    let cell = document.createElement('td');
+                    cell.style.height = '45px';  // td 요소의 높이를 고정
+                    cell.style.overflow = 'auto';  // 내용이 너무 많으면 스크롤을 생성
+                    let filler = document.createElement('div');
+                    filler.style.height = '100%';  // div 요소의 높이를 td 요소의 높이에 맞춤
+                    cell.appendChild(filler);
+                    row.appendChild(cell);
+                }
+                table.appendChild(row);
+            }
+        }
+
+
 
         function fetchMyPosts(page = 0) {
             fetch(`/api/members/${memberId}/posts?page=${page}`)
@@ -33,60 +61,106 @@
                             <th>ID</th>
                             <th>Title</th>
                             <th>Content</th>
-                            <th>Posted At</th>
                             <th>Writer Name</th>
+                            <th>Posted At</th>
                             <th>Delete</th>
                         </tr>
                     `;
                     data.content.forEach(post => {
                         let row = document.createElement('tr');
-
                         let idCell = document.createElement('td');
                         idCell.innerText = post.id;
                         row.appendChild(idCell);
 
                         let titleCell = document.createElement('td');
-                        titleCell.innerText = post.title;
+                        titleCell.innerText = post.title.length > 10 ? post.title.substring(0, 20) + "..." : post.title;
                         titleCell.style.cursor = "pointer";
                         titleCell.onclick = () => showPostDetail(post.id);
                         row.appendChild(titleCell);
 
                         let contentCell = document.createElement('td');
-                        contentCell.innerText = post.content;
+                        contentCell.innerText = post.content.length > 20 ? post.content.substring(0, 10) + "..." : post.content;
                         row.appendChild(contentCell);
 
-                        let postedAtCell = document.createElement('td');
-                        postedAtCell.innerText = new Date(post.postedAt).toLocaleString();
-                        row.appendChild(postedAtCell);
 
                         let writerCell = document.createElement('td');
                         writerCell.innerText = post.writerName;
                         row.appendChild(writerCell);
 
+                        let postedAtCell = document.createElement('td');
+                        postedAtCell.innerText = new Date(post.postedAt).toLocaleString();
+                        row.appendChild(postedAtCell);
+
                         let deleteCell = document.createElement('td');
                         let deleteButton = document.createElement('button');
                         deleteButton.innerText = 'X';
-                        deleteButton.onclick = () => deletePost(data.data.id, post.id);
+                            deleteButton.classList.add("btn", "btn-sm", "btn-danger");
+                            deleteButton.onclick = () => deletePost(post.id);
                         deleteCell.appendChild(deleteButton);
                         row.appendChild(deleteCell);
 
                         postTable.appendChild(row);
-                    });
+
+
+
+                    }
+
+                    );
 
                     let pagination = document.getElementById('posts-pagination');
                     pagination.innerHTML = '';
-                    for (let i = 0; i < data.total_pages; i++) {
+
+                    let groupSize = 10;
+                    let currentGroup = Math.floor(page / groupSize);
+
+// Previous button
+                    let prevButton = document.createElement('button');
+                    prevButton.innerText = 'Prev';
+                    prevButton.classList.add("btn", "btn-primary", "mr-2");
+                    prevButton.onclick = () => {
+                        if (currentGroup > 0) {
+                            currentGroup--;
+                            let newPage = currentGroup * groupSize;
+                            fetchMyPosts(newPage);
+                            window.localStorage.setItem('currentPostsPage', newPage);
+                            window.history.pushState({type: 'post', page: newPage}, `Page ${newPage}`, `?page=${newPage}`);
+                        }
+                    };
+                    pagination.appendChild(prevButton);
+
+// Generate buttons for each page in the current group
+                    for (let i = currentGroup * groupSize; i < Math.min((currentGroup + 1) * groupSize, data.total_pages); i++) {
                         let button = document.createElement('button');
                         button.innerText = i + 1;
+                        button.classList.add("btn", "btn-primary", "mr-2");
+                        if(i === page) {
+                            button.classList.add("btn-secondary");
+                        }
                         button.onclick = () => {
                             fetchMyPosts(i);
                             window.localStorage.setItem('currentPostsPage', i);
+                            window.history.pushState({type: 'post', page: i}, `Page ${i}`, `?page=${i}`);
                         };
-                        if(i === data.current_page) {
-                            button.style.backgroundColor = "#aaa";
-                        }
                         pagination.appendChild(button);
                     }
+
+// Next button
+                    let nextButton = document.createElement('button');
+                    nextButton.innerText = 'Next';
+                    nextButton.classList.add("btn", "btn-primary", "mr-2");
+                    nextButton.onclick = () => {
+                        if (currentGroup < Math.floor((data.total_pages - 1) / groupSize)) {
+                            currentGroup++;
+                            let newPage = currentGroup * groupSize;
+                            fetchMyPosts(newPage);
+                            window.localStorage.setItem('currentPostsPage', newPage);
+                            window.history.pushState({type: 'post', page: newPage}, `Page ${newPage}`, `?page=${newPage}`);
+                        }
+                    };
+                    pagination.appendChild(nextButton);
+
+
+                    addEmptyRows(postTable, MAX_ROWS - data.content.length);
                 });
         }
 
@@ -126,27 +200,69 @@
                         let deleteCell = document.createElement('td');
                         let deleteButton = document.createElement('button');
                         deleteButton.innerText = 'X';
-                        deleteButton.onclick = () => deleteComment(data.data.id, comment.id);
+                        deleteButton.classList.add("btn", "btn-sm", "btn-danger");
+                        deleteButton.onclick = () => deleteComment(comment.id);
                         deleteCell.appendChild(deleteButton);
                         row.appendChild(deleteCell);
 
                         commentTable.appendChild(row);
+
+
                     });
 
                     let pagination = document.getElementById('comments-pagination');
                     pagination.innerHTML = '';
-                    for (let i = 0; i < data.total_pages; i++) {
+
+                    let groupSize = 10;
+                    let currentGroup = Math.floor(page / groupSize);
+
+// Previous button
+                    let prevButton = document.createElement('button');
+                    prevButton.innerText = 'Prev';
+                    prevButton.classList.add("btn", "btn-primary", "mr-2");
+                    prevButton.onclick = () => {
+                        if (currentGroup > 0) {
+                            currentGroup--;
+                            let newPage = currentGroup * groupSize;
+                            fetchMyComments(newPage);
+                            window.localStorage.setItem('currentCommentsPage', newPage);
+                            window.history.pushState({type: 'comment', page: newPage}, `Page ${newPage}`, `?page=${newPage}`);
+                        }
+                    };
+                    pagination.appendChild(prevButton);
+
+// Generate buttons for each page in the current group
+                    for (let i = currentGroup * groupSize; i < Math.min((currentGroup + 1) * groupSize, data.total_pages); i++) {
                         let button = document.createElement('button');
                         button.innerText = i + 1;
+                        button.classList.add("btn", "btn-primary", "mr-2");
+                        if(i === page) {
+                            button.classList.add("btn-secondary");
+                        }
                         button.onclick = () => {
                             fetchMyComments(i);
                             window.localStorage.setItem('currentCommentsPage', i);
+                            window.history.pushState({type: 'comment', page: i}, `Page ${i}`, `?page=${i}`);
                         };
-                        if(i === data.current_page) {
-                            button.style.backgroundColor = "#aaa";
-                        }
                         pagination.appendChild(button);
                     }
+
+// Next button
+                    let nextButton = document.createElement('button');
+                    nextButton.innerText = 'Next';
+                    nextButton.classList.add("btn", "btn-primary", "mr-2");
+                    nextButton.onclick = () => {
+                        if (currentGroup < Math.floor((data.total_pages - 1) / groupSize)) {
+                            currentGroup++;
+                            let newPage = currentGroup * groupSize;
+                            fetchMyComments(newPage);
+                            window.localStorage.setItem('currentCommentsPage', newPage);
+                            window.history.pushState({type: 'comment', page: newPage}, `Page ${newPage}`, `?page=${newPage}`);
+                        }
+                    };
+                    pagination.appendChild(nextButton);
+
+                    addEmptyRows(commentTable, MAX_ROWS - data.content.length);
                 });
         }
 
@@ -173,30 +289,45 @@
         }
 
         window.onload = () => {
+            localStorage.removeItem('currentPostsPage');
+            localStorage.removeItem('currentCommentsPage');
             fetchMyInfo();
-            let savedPostsPage = window.localStorage.getItem('currentPostsPage');
-            if(savedPostsPage !== null) {
-                fetchMyPosts(parseInt(savedPostsPage));
-            } else {
-                fetchMyPosts();
-            }
-            let savedCommentsPage = window.localStorage.getItem('currentCommentsPage');
-            if(savedCommentsPage !== null) {
-                fetchMyComments(parseInt(savedCommentsPage));
-            } else {
-                fetchMyComments();
-            }
+            window.onpopstate = function(event) {
+                if(event.state.type === 'post') {
+                    fetchMyPosts(event.state.page);
+                }
+                else if(event.state.type === 'comment') {
+                    fetchMyComments(event.state.page);
+                }
+            };
         };
+
+        function goToPostList() {
+            window.location.href = '/posts';
+        }
+
     </script>
 </head>
 <body>
-<h1>My Room</h1>
-<div id="user-info"></div>
-<h2>My Posts</h2>
-<table id="post-table"></table>
-<nav id="posts-pagination"></nav>
-<h2>My Comments</h2>
-<table id="comment-table"></table>
-<nav id="comments-pagination"></nav>
+    <div class="container-fluid mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1>My Room</h1>
+                <button onclick="goToPostList()" class="btn btn-primary">Go to Post List</button>
+                <div id="user-info" class="my-3"></div>
+                <h2 class="my-4">My Posts</h2>
+                <table id="post-table" class="table mb-0"></table>
+                <nav id="posts-pagination" class="mt-0 mb-4 d-flex justify-content-center"></nav>
+
+                <h2 class="my-4">My Comments</h2>
+                <table id="comment-table" class="table mb-0"></table>
+                <nav id="comments-pagination" class="mt-0 mb-4 d-flex justify-content-center"></nav>
+
+            </div>
+        </div>
+    </div>
+
+
 </body>
+
 </html>

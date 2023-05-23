@@ -135,7 +135,7 @@ public class PostController {
                                                          @PathVariable Long commentId) {
 
         commentService.deleteComment(commentId);
-        BasicResponse memberBasicResponse = new BasicResponse("게시글 삭제 완료", null);
+        BasicResponse memberBasicResponse = new BasicResponse("댓글 삭제 완료", null);
         return new ResponseEntity<>(memberBasicResponse, HttpStatus.OK);
     }
 

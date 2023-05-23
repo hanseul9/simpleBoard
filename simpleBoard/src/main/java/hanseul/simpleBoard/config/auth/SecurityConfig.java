@@ -31,11 +31,13 @@ public class SecurityConfig{
 
     private final GoogleOauth2UserService googleOauth2UserService;
 
+    private final CustomAuthenticationFailureHandler authenticationFailureHandler;
+
     protected void configure(HttpSecurity http) throws Exception { //세션관리
         http
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
-                .invalidSessionUrl("/")
+                .invalidSessionUrl("/login")
                 .maximumSessions(1);
     }
 
@@ -55,8 +57,8 @@ public class SecurityConfig{
                         .passwordParameter("password") //submit할 비밀번호
                         .defaultSuccessUrl("/posts", true) //성공시
                         .failureUrl("/login") //로그인 실패시
+                        .failureHandler(authenticationFailureHandler)
                         .permitAll()  // 로그인 페이지 이동이 막히면 안되므로 관련된애들 모두 허용
-
                 )
 
                 .oauth2Login(oauth2 -> oauth2
@@ -71,11 +73,16 @@ public class SecurityConfig{
 
 
                 .logout(withDefaults())  // 로그아웃은 기본설정으로 (/logout으로 인증해제)
-                //.logout((logout) -> logout.permitAll());
+
 
                 //.httpBasic()//postman 사용시 필요
                 ;
 
+
+        http
+                .sessionManagement()
+                .maximumSessions(1)
+                .maxSessionsPreventsLogin(true);
 
         return http.build();
     }

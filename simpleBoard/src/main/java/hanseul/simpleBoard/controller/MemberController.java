@@ -124,7 +124,7 @@ public class MemberController {
     public ResponseEntity<Map<String, Object>> getMembersPosts(@PathVariable Long memberId,
                                                                @RequestParam(value = "page", defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 10);
-        Page<PostListDto> postList = postService.findByMemberIdOrderByPostedAtDescIdAsc(pageable, memberId)
+        Page<PostListDto> postList = postService.findByMemberIdOrderByPostedAtDescIdDESC(pageable, memberId)
                 .map(PostListDto::new);
 
         Map<String, Object> response = new HashMap<>();
@@ -142,7 +142,7 @@ public class MemberController {
                                                                           @RequestParam(value = "page", defaultValue = "0") int page) {
         Pageable pageable = PageRequest.of(page, 10);
 
-        Page<CommentGetResponseDto> commentList = commentService.findByMemberIdOrderByCommentedAtDescIdAsc(pageable, memberId)
+        Page<CommentGetResponseDto> commentList = commentService.findByMemberIdOrderByCommentedAtDescIdDESC(pageable, memberId)
                 .map(CommentGetResponseDto::new);
 
         Map<String, Object> response = new HashMap<>();

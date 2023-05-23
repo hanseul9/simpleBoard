@@ -3,28 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>Login Form</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<h2>Login Form</h2>
-<form th:action="@{/login-process}" method="post">
-    <div>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email"/>
-    </div>
+<div class="container">
+    <h2 class="text-center" style="margin: 30px">Login Form</h2>
 
-    <div>
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password"/>
-    </div>
-
-    <div>
-        <button type="submit">로그인</button>
-        <button type="button" onclick="location.href='/signup'">Sign Up</button>
-    </div>
+    <script th:if="${session.loginError}" th:inline="javascript">
+        alert('로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.');
+    </script>
 
 
-    <a href="/oauth2/authorization/google" class="btn btn-success active" role="button">
-        구글로 로그인</a>
-</form>
+    <form th:action="@{/login-process}" method="post">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" class="form-control"/>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" class="form-control"/>
+        </div>
+
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">로그인</button>
+            <button type="button" class="btn btn-secondary" onclick="location.href='/signup'">Sign Up</button>
+
+        </div>
+
+        <a href="/oauth2/authorization/google" class="btn btn-success btn-block active" role="button">
+            구글로 로그인</a>
+    </form>
+</div>
 </body>
 </html>

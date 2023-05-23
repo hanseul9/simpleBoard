@@ -44,7 +44,7 @@ public class CommentService {
         return comment;
     }
 
-    public Page<Comment> findByMemberIdOrderByCommentedAtDescIdAsc(Pageable pageable, Long memberId) {
-        return commentRepository.findByMemberIdOrderByCommentedAtDescIdAsc( pageable, memberId);
+    public Page<Comment> findByMemberIdOrderByCommentedAtDescIdDESC(Pageable pageable, Long memberId) {
+        return commentRepository.findByMemberIdOrderByCommentedAtDescIdDESC( pageable, memberId);
     }
 }
